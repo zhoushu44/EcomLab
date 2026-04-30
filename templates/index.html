@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电商主图 MAB 测试系统 - 每日数据</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f3f6fb;
+            --card: #ffffff;
+            --primary: #2563eb;
+            --primary-soft: #dbeafe;
+            --primary-deep: #1d4ed8;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --good: #16a34a;
+            --warn: #d97706;
+            --danger: #dc2626;
+            --info: #0f766e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 28px 20px 60px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #eff6ff, #ffffff);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.08);
+        }
+
+        .hero h1 {
+            margin: 0 0 12px;
+            font-size: 34px;
+        }
+
+        .hero p {
+            margin: 6px 0;
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #eef2ff;
+            color: #3730a3;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            margin: 0 0 16px;
+            font-size: 22px;
+        }
+
+        .card h3 {
+            margin: 0 0 14px;
+            font-size: 18px;
+            color: #374151;
+        }
+
+        .daily-section {
+            margin-bottom: 20px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #fafafa;
+        }
+
+        .daily-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .daily-date {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .daily-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .daily-table th,
+        .daily-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .daily-table th {
+            background: #f8fafc;
+            color: #6b7280;
+        }
+
+        .daily-table input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .daily-table input[type="date"] {
+            padding: 6px 8px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .metric {
+            border-radius: 14px;
+            padding: 16px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+        }
+
+        .metric span {
+            display: block;
+            color: var(--muted);
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .metric strong {
+            font-size: 22px;
+        }
+
+        .phase-box {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            align-items: center;
+            padding: 16px 18px;
+            border-radius: 16px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .phase-label {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .phase-value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #374151;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .tag-good {
+            background: #dcfce7;
+            color: var(--good);
+        }
+
+        .tag-mid {
+            background: #fef3c7;
+            color: var(--warn);
+        }
+
+        .tag-danger {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .tag-info {
+            background: #ccfbf1;
+            color: var(--info);
+        }
+
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 4px;
+            vertical-align: middle;
+            transition: background 0.2s;
+        }
+
+        .tooltip-wrapper:hover .tooltip-icon {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+            width: 280px;
+            z-index: 100;
+            margin-top: 8px;
+            transition: opacity 0.2s, visibility 0.2s;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .tooltip-wrapper:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip-content h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #93c5fd;
+        }
+
+        .tooltip-content p {
+            margin: 6px 0;
+        }
+
+        .tooltip-content .formula {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 8px;
+            overflow-x: auto;
+        }
+
+        .tooltip-arrow {
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid #1f2937;
+        }
+
+        .explain {
+            margin-top: 18px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .paper-box {
+            margin-top: 18px;
+            padding: 16px;
+            background: #eff6ff;
+            border-radius: 14px;
+            border: 1px solid #bfdbfe;
+            line-height: 1.8;
+        }
+
+        .paper-box strong {
+            color: var(--primary-deep);
+        }
+
+        .decision-board {
+            display: grid;
+            gap: 14px;
+        }
+
+        .decision-card {
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, #ffffff, #f8fafc);
+        }
+
+        .decision-title {
+            margin: 0 0 10px;
+            font-size: 15px;
+            color: var(--muted);
+        }
+
+        .decision-main {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .decision-desc {
+            color: var(--muted);
+            line-height: 1.75;
+            font-size: 14px;
+        }
+
+        .highlight {
+            border: 1px solid #bfdbfe;
+            background: linear-gradient(180deg, #eff6ff, #f8fbff);
+        }
+
+        .trend-card {
+            border-radius: 14px;
+            padding: 16px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .trend-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .trend-name {
+            font-weight: 600;
+        }
+
+        .trend-ctr {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .trend-bars {
+            display: flex;
+            gap: 4px;
+            align-items: flex-end;
+            height: 40px;
+        }
+
+        .trend-bar {
+            flex: 1;
+            background: var(--primary-soft);
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+            position: relative;
+        }
+
+        .trend-bar.highest {
+            background: var(--primary);
+        }
+
+        @media (max-width: 1024px) {
+            .summary {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 720px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 18px 12px 36px;
+            }
+
+            .hero h1 {
+                font-size: 26px;
+            }
+
+            .phase-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .daily-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="hero">
+            <h1>电商主图 MAB 测试系统 - 每日数据录入</h1>
+            <p>按照论文要求，支持按天录入每张主图的访客数和点击数，系统会自动累计计算整体数据，并展示每日趋势变化。</p>
+            <div class="hero-badges">
+                <span class="badge">每日数据录入</span>
+                <span class="badge">自动累计计算</span>
+                <span class="badge">每日趋势展示</span>
+                <span class="badge">置信区间判断</span>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>每日主图测试数据</h2>
+            <form method="post">
+                <div class="actions">
+                    <button class="btn btn-secondary" type="button" onclick="addNewDay()">添加新日期</button>
+                    <button class="btn btn-secondary" type="button" onclick="window.location.href='/'">恢复默认样例</button>
+                </div>
+
+                <div id="daily-containers">
+                    {% for day in daily_data %}
+                    <div class="daily-section" data-day-index="{{ loop.index0 }}">
+                        <div class="daily-header">
+                            <div>
+                                <span class="daily-date">第 {{ loop.index }} 天</span>
+                                <input type="date" name="date[]" value="{{ day.date }}" style="margin-left: 10px;">
+                            </div>
+                            <button type="button" class="btn btn-secondary" onclick="removeDay(this)" style="padding: 6px 12px; font-size: 12px;">删除</button>
+                        </div>
+                        <table class="daily-table">
+                            <thead>
+                                <tr>
+                                    <th>主图编号</th>
+                                    <th>主图类型</th>
+                                    <th>访客数</th>
+                                    <th>点击数</th>
+                                    <th>当日点击率</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in day.data %}
+                                <tr>
+                                    <td><input type="text" name="{{ day.date.replace('-', '') }}_name[]" value="{{ item.name }}"></td>
+                                    <td><input type="text" name="{{ day.date.replace('-', '') }}_image_type[]" value="{{ item.image_type }}"></td>
+                                    <td><input type="number" min="0" name="{{ day.date.replace('-', '') }}_visitors[]" value="{{ item.visitors }}"></td>
+                                    <td><input type="number" min="0" name="{{ day.date.replace('-', '') }}_clicks[]" value="{{ item.clicks }}"></td>
+                                    <td>
+                                        {% set ctr = item.clicks / item.visitors if item.visitors > 0 else 0 %}
+                                        {{ '%.2f%%'|format(ctr * 100) }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="actions" style="margin-top: 20px;">
+                    <button class="btn btn-primary" type="submit">计算累计结果</button>
+                </div>
+            </form>
+
+            <div class="paper-box">
+                <strong>论文落地提醒：</strong>
+                每天录入数据后，系统会自动累计所有天数的数据进行分析。随着数据积累，置信区间会逐渐收窄，检测功效会提升，这时才能更准确地判断主图好坏。
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>实验总览</h2>
+            <div class="summary">
+                <div class="metric">
+                    <span>测试天数</span>
+                    <strong>{{ results.days_count }}</strong>
+                </div>
+                <div class="metric">
+                    <span>总访客数</span>
+                    <strong>{{ results.total_visitors }}</strong>
+                </div>
+                <div class="metric">
+                    <span>总点击数</span>
+                    <strong>{{ results.total_clicks }}</strong>
+                </div>
+                <div class="metric">
+                    <span>整体平均点击率</span>
+                    <strong>{{ '%.2f%%'|format(results.average_ctr * 100) }}</strong>
+                </div>
+            </div>
+
+            <div class="phase-box">
+                <div>
+                    <div class="phase-label">当前实验阶段</div>
+                    <div class="phase-value">{{ results.summary.phase }}</div>
+                </div>
+                <div>
+                    {% if results.summary.winner_ready %}
+                    <span class="tag tag-good">可进入上线判断</span>
+                    {% elif results.summary.overlap_count > 0 %}
+                    <span class="tag tag-mid">区间仍有重叠</span>
+                    {% else %}
+                    <span class="tag tag-info">可继续动态放量</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if results.best_variant %}
+            <div class="decision-board">
+                <div class="decision-card highlight">
+                    <div class="decision-title">当前 MAB 重点推荐</div>
+                    <div class="decision-main">{{ results.best_variant.name }}</div>
+                    <div class="decision-desc">
+                        主图类型：{{ results.best_variant.image_type }}<br>
+                        建议动态流量占比：{{ '%.2f%%'|format(results.best_variant.mab_share * 100) }}<br>
+                        当前判断：{{ results.best_variant.comparison }}
+                    </div>
+                </div>
+
+                <div class="decision-card">
+                    <div class="decision-title">MAB 决策视角</div>
+                    <div class="decision-desc">{{ results.summary.mab_conclusion }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="card">
+            <h2>每日点击率趋势</h2>
+            {% for row in results.rows %}
+            <div class="trend-card">
+                <div class="trend-header">
+                    <span class="trend-name">{{ row.name }} ({{ row.image_type }})</span>
+                    <span class="trend-ctr">累计 {{ '%.2f%%'|format(row.ctr * 100) }}</span>
+                </div>
+                <div class="trend-bars">
+                    {% for day in row.daily %}
+                    <div 
+                        class="trend-bar {% if day.is_highest %}highest{% endif %}" 
+                        style="height: {{ day.bar_height }}%"
+                        title="{{ day.date }}: {{ '%.2f%%'|format(day.ctr * 100) }}"
+                    ></div>
+                    {% endfor %}
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--muted);">
+                    {% for day in row.daily %}
+                    <span>{{ day.date[-2:] }}日</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section class="card">
+            <h2>MAB 多臂老虎机动态分流结果（累计）</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>主图编号</th>
+                        <th>累计点击率</th>
+                        <th>
+                            CI 下限
+                            <span class="tooltip-wrapper">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-content">
+                                    <span class="tooltip-arrow"></span>
+                                    <h4>CI 下限</h4>
+                                    <p>点击率的最小可能值（95%概率范围内）。数值越高说明下限越稳。</p>
+                                    <div class="formula">下限 = 点击率 - 1.96 × √(点击率×(1-点击率)/访客数)</div>
+                                </span>
+                            </span>
+                        </th>
+                        <th>
+                            CI 上限
+                            <span class="tooltip-wrapper">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-content">
+                                    <span class="tooltip-arrow"></span>
+                                    <h4>CI 上限</h4>
+                                    <p>点击率的最大可能值（95%概率范围内）。数值越高说明上限越高。</p>
+                                    <div class="formula">上限 = 点击率 + 1.96 × √(点击率×(1-点击率)/访客数)</div>
+                                </span>
+                            </span>
+                        </th>
+                        <th>
+                            区间宽度
+                            <span class="tooltip-wrapper">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-content">
+                                    <span class="tooltip-arrow"></span>
+                                    <h4>区间宽度</h4>
+                                    <p>上限减下限的差值。宽度越小，说明数据越稳定可靠。</p>
+                                    <div class="formula">宽度 = CI上限 - CI下限</div>
+                                </span>
+                            </span>
+                        </th>
+                        <th>
+                            数据可靠等级
+                            <span class="tooltip-wrapper">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-content">
+                                    <span class="tooltip-arrow"></span>
+                                    <h4>数据可靠等级</h4>
+                                    <p>根据区间宽度判断数据靠谱程度：</p>
+                                    <p>- 高可靠：宽度 < 5%</p>
+                                    <p>- 中可靠：5% ≤ 宽度 < 10%</p>
+                                    <p>- 低可靠：宽度 ≥ 10%</p>
+                                </span>
+                            </span>
+                        </th>
+                        <th>
+                            检测功效等级
+                            <span class="tooltip-wrapper">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-content">
+                                    <span class="tooltip-arrow"></span>
+                                    <h4>检测功效等级</h4>
+                                    <p>判断能否真实测出主图好坏的能力：</p>
+                                    <p>- 高识别力：访客数 > 500</p>
+                                    <p>- 中识别力：200 < 访客数 ≤ 500</p>
+                                    <p>- 低识别力：访客数 ≤ 200</p>
+                                </span>
+                            </span>
+                        </th>
+                        <th>
+                            与最优图比较
+                            <span class="tooltip-wrapper">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-content">
+                                    <span class="tooltip-arrow"></span>
+                                    <h4>与最优图比较</h4>
+                                    <p>根据置信区间判断当前图与最好图的差距：</p>
+                                    <p>- 显著领先：区间完全高于其他图</p>
+                                    <p>- 暂时领先：当前最高但区间有重叠</p>
+                                    <p>- 结果未拉开：区间重叠较多</p>
+                                    <p>- 显著落后：区间完全低于最好图</p>
+                                </span>
+                            </span>
+                        </th>
+                        <th>动态流量占比</th>
+                        <th>流量调整建议</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in results.rows %}
+                    <tr>
+                        <td>{{ row.name }}</td>
+                        <td>{{ '%.2f%%'|format(row.ctr * 100) }}</td>
+                        <td>{{ '%.2f%%'|format(row.ci_low * 100) }}</td>
+                        <td>{{ '%.2f%%'|format(row.ci_high * 100) }}</td>
+                        <td>{{ '%.2f%%'|format(row.ci_width * 100) }}</td>
+                        <td>
+                            <span class="tag {% if row.reliability == '高可靠' %}tag-good{% elif row.reliability == '中可靠' %}tag-mid{% else %}tag-danger{% endif %}">{{ row.reliability }}</span>
+                        </td>
+                        <td>
+                            <span class="tag {% if row.power == '高识别力' %}tag-good{% elif row.power == '中识别力' %}tag-mid{% else %}tag-danger{% endif %}">{{ row.power }}</span>
+                        </td>
+                        <td>
+                            <span class="tag {% if row.comparison == '显著领先' %}tag-good{% elif row.comparison == '显著落后' %}tag-danger{% else %}tag-info{% endif %}">{{ row.comparison }}</span>
+                        </td>
+                        <td>{{ '%.2f%%'|format(row.mab_share * 100) }}</td>
+                        <td>{{ row.recommendation }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="card">
+            <h2>按照论文使用说明</h2>
+            <div class="explain">
+                1. <strong>每天录入数据</strong>：在上方表格中填写每张主图当天的访客数和点击数。<br>
+                2. <strong>观察趋势</strong>：查看每日点击率趋势图，了解各主图效果的稳定性。<br>
+                3. <strong>关注置信区间</strong>：随着数据积累，区间会逐渐变窄，数据会从低可靠→中可靠→高可靠变化。<br>
+                4. <strong>等待识别力提升</strong>：当样本量足够大（访客数>500），检测功效会达到高识别力。<br>
+                5. <strong>做出决策</strong>：当某张图同时具备高可靠+高识别力，且与其他图区间不重叠时，可进入上线判断。<br>
+                6. <strong>持续优化</strong>：根据 MAB 建议动态调整流量，让好图获得更多曝光。
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function addNewDay() {
+            const containers = document.getElementById('daily-containers');
+            const dayCount = containers.children.length + 1;
+            const today = new Date().toISOString().split('T')[0];
+            
+            const daySection = document.createElement('div');
+            daySection.className = 'daily-section';
+            
+            const lastDay = containers.lastElementChild;
+            let innerHTML = `
+                <div class="daily-header">
+                    <div>
+                        <span class="daily-date">第 ${dayCount} 天</span>
+                        <input type="date" name="date[]" value="${today}" style="margin-left: 10px;">
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="removeDay(this)" style="padding: 6px 12px; font-size: 12px;">删除</button>
+                </div>
+                <table class="daily-table">
+                    <thead>
+                        <tr>
+                            <th>主图编号</th>
+                            <th>主图类型</th>
+                            <th>访客数</th>
+                            <th>点击数</th>
+                            <th>当日点击率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            if (lastDay) {
+                const lastTable = lastDay.querySelector('table');
+                const rows = lastTable.querySelectorAll('tbody tr');
+                rows.forEach((row, index) => {
+                    const nameInput = row.querySelector('input[name*="_name"]');
+                    const typeInput = row.querySelector('input[name*="_image_type"]');
+                    const name = nameInput ? nameInput.value : `主图${index + 1}`;
+                    const imageType = typeInput ? typeInput.value : '未分类';
+                    innerHTML += `
+                        <tr>
+                            <td><input type="text" name="temp_name[]" value="${name}"></td>
+                            <td><input type="text" name="temp_image_type[]" value="${imageType}"></td>
+                            <td><input type="number" min="0" name="temp_visitors[]" value="0"></td>
+                            <td><input type="number" min="0" name="temp_clicks[]" value="0"></td>
+                            <td>0.00%</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                innerHTML += `
+                    <tr>
+                        <td><input type="text" name="temp_name[]" value="主图1"></td>
+                        <td><input type="text" name="temp_image_type[]" value="白底图"></td>
+                        <td><input type="number" min="0" name="temp_visitors[]" value="0"></td>
+                        <td><input type="number" min="0" name="temp_clicks[]" value="0"></td>
+                        <td>0.00%</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" name="temp_name[]" value="主图2"></td>
+                        <td><input type="text" name="temp_image_type[]" value="场景图"></td>
+                        <td><input type="number" min="0" name="temp_visitors[]" value="0"></td>
+                        <td><input type="number" min="0" name="temp_clicks[]" value="0"></td>
+                        <td>0.00%</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" name="temp_name[]" value="主图3"></td>
+                        <td><input type="text" name="temp_image_type[]" value="细节图"></td>
+                        <td><input type="number" min="0" name="temp_visitors[]" value="0"></td>
+                        <td><input type="number" min="0" name="temp_clicks[]" value="0"></td>
+                        <td>0.00%</td>
+                    </tr>
+                `;
+            }
+            
+            innerHTML += `
+                    </tbody>
+                </table>
+            `;
+            daySection.innerHTML = innerHTML;
+            containers.appendChild(daySection);
+            
+            updateInputNames();
+        }
+
+        function removeDay(button) {
+            const daySection = button.parentElement.parentElement;
+            const containers = document.getElementById('daily-containers');
+            
+            if (containers.children.length > 1) {
+                containers.removeChild(daySection);
+                updateDayNumbers();
+                updateInputNames();
+            }
+        }
+
+        function updateDayNumbers() {
+            const daySections = document.querySelectorAll('.daily-section');
+            daySections.forEach((section, index) => {
+                const dateSpan = section.querySelector('.daily-date');
+                if (dateSpan) {
+                    dateSpan.textContent = `第 ${index + 1} 天`;
+                }
+            });
+        }
+
+        function updateInputNames() {
+            const daySections = document.querySelectorAll('.daily-section');
+            daySections.forEach((section, dayIndex) => {
+                const dateInput = section.querySelector('input[name="date[]"]');
+                const date = dateInput ? dateInput.value || `2024-01-${String(dayIndex + 1).padStart(2, '0')}` : `2024-01-${String(dayIndex + 1).padStart(2, '0')}`;
+                const prefix = date.replace(/-/g, '');
+                
+                const table = section.querySelector('table');
+                const rows = table.querySelectorAll('tbody tr');
+                
+                rows.forEach((row, rowIndex) => {
+                    const inputs = row.querySelectorAll('input');
+                    inputs[0].name = `${prefix}_name[]`;
+                    inputs[1].name = `${prefix}_image_type[]`;
+                    inputs[2].name = `${prefix}_visitors[]`;
+                    inputs[3].name = `${prefix}_clicks[]`;
+                });
+            });
+        }
+
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'date[]') {
+                updateInputNames();
+            }
+        });
+    </script>
+</body>
+</html>
