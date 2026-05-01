@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>左右对比 · MAB vs Best of Three Worlds</title>
+    <style>
+        :root {
+            --bg: #f5f5f7;
+            --card-bg: #ffffff;
+            --text: #1d1d1f;
+            --text-secondary: #86868b;
+            --border: #d2d2d7;
+            --accent: #0071e3;
+            --accent-light: #e8f0fe;
+            --good: #34c759;
+            --good-bg: #eaf8ee;
+            --danger: #ff3b30;
+            --danger-bg: #fff0ef;
+            --mid: #ff9500;
+            --mid-bg: #fff5e6;
+            --info: #007aff;
+            --info-bg: #e8f0fe;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .topbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        .topbar .logo { font-size: 18px; font-weight: 700; }
+        .topbar .nav { display: flex; gap: 12px; align-items: center; }
+        .topbar .nav a {
+            text-decoration: none;
+            color: var(--accent);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        .topbar .nav a:hover { background: var(--accent-light); }
+        .topbar .nav a.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+        h1 { font-size: 24px; margin-bottom: 8px; }
+        .subtitle { color: var(--text-secondary); margin-bottom: 24px; font-size: 14px; }
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .panel h2 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+        .panel.mab h2 { color: var(--accent); border-color: var(--accent); }
+        .panel.botw h2 { color: var(--good); border-color: var(--good); }
+        .panel table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .panel table th, .panel table td {
+            padding: 8px 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .panel table th {
+            background: #f9f9fb;
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .tag-good { background: var(--good-bg); color: var(--good); }
+        .tag-mid { background: var(--mid-bg); color: var(--mid); }
+        .tag-danger { background: var(--danger-bg); color: var(--danger); }
+        .tag-info { background: var(--info-bg); color: var(--info); }
+        .explain {
+            background: var(--accent-light);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-top: 16px;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .highlight { font-weight: 700; color: var(--accent); }
+        .winner { background: var(--good-bg); border-radius: 6px; padding: 4px 8px; }
+        .eliminated { background: var(--danger-bg); border-radius: 6px; padding: 4px 8px; text-decoration: line-through; }
+        .form-section { margin-bottom: 20px; }
+        .form-section textarea {
+            width: 100%;
+            height: 60px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-secondary { background: #e8e8ed; color: var(--text); }
+        .btn-secondary:hover { background: #d2d2d7; }
+        .actions { display: flex; gap: 10px; margin: 16px 0; flex-wrap: wrap; }
+        .metric-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+        .metric {
+            background: #f9f9fb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            text-align: center;
+            min-width: 100px;
+            flex: 1;
+        }
+        .metric span { display: block; font-size: 11px; color: var(--text-secondary); }
+        .metric strong { display: block; font-size: 18px; margin-top: 4px; }
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--border);
+            padding: 40px 0;
+            user-select: none;
+        }
+        @media (max-width: 900px) {
+            .compare-grid { grid-template-columns: 1fr; }
+            .vs-divider { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo">EcomLab · 左右对比</div>
+        <div class="nav">
+            <a href="/">MAB 多臂老虎机</a>
+            <a href="/paper">Best of Three Worlds</a>
+            <a href="/compare" class="active">左右对比</a>
+            <a href="#" onclick="exportData()">导出 JSON</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>MAB 多臂老虎机 vs Best of Three Worlds</h1>
+        <p class="subtitle">同一份实验数据，左右并排对比两种方法的核心差异 — 固定均分 vs 动态消除与倾斜分流</p>
+
+        <div class="form-section">
+            <form method="post" enctype="multipart/form-data">
+                <textarea name="json_input" placeholder="粘贴 JSON 格式数据，或留空使用默认样例...">{"date":["2024-01-01","2024-01-02","2024-01-03","2024-01-04","2024-01-05","2024-01-06","2024-01-07"],"20240101_name":["主图A","主图B","主图C","主图D"],"20240101_image_type":["白底图","场景图","细节图","模特图"],"20240101_visitors":[2500,2500,2500,2500],"20240101_clicks":[120,140,90,110],"20240102_name":["主图A","主图B","主图C","主图D"],"20240102_image_type":["白底图","场景图","细节图","模特图"],"20240102_visitors":[2500,2500,2500,2500],"20240102_clicks":[115,145,85,108],"20240103_name":["主图A","主图B","主图C","主图D"],"20240103_image_type":["白底图","场景图","细节图","模特图"],"20240103_visitors":[2500,2500,2500,2500],"20240103_clicks":[118,142,88,105],"20240104_name":["主图A","主图B","主图D"],"20240104_image_type":["白底图","场景图","模特图"],"20240104_visitors":[3333,3333,3334],"20240104_clicks":[150,190,140],"20240105_name":["主图A","主图B","主图D"],"20240105_image_type":["白底图","场景图","模特图"],"20240105_visitors":[3333,3333,3334],"20240105_clicks":[148,195,138],"20240106_name":["主图B","主图D"],"20240106_image_type":["场景图","模特 图"],"20240106_visitors":[6000,4000],"20240106_clicks":[290,160],"20240107_name":["主图B","主图D"],"20240107_image_type":["场景图","模特图"],"20240107_visitors":[6000,4000],"20240107_clicks":[295,155]}</textarea>
+                <div class="actions">
+                    <button class="btn btn-primary" type="submit">加载数据并计算</button>
+                    <button class="btn btn-secondary" type="button" onclick="window.location.href='/compare'">恢复默认</button>
+                    <button class="btn btn-secondary" type="button" onclick="exportData()">导出 JSON</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="compare-grid">
+            <div class="panel mab">
+                <h2>🔄 MAB 多臂老虎机（固定均分）</h2>
+                <div class="metric-row">
+                    <div class="metric"><span>总流量</span><strong>{{ results.total_visitors }}</strong></div>
+                    <div class="metric"><span>平均 CTR</span><strong>{{ '%.2f%%'|format(results.average_ctr * 100) }}</strong></div>
+                    <div class="metric"><span>阶段</span><strong>{{ results.summary.phase }}</strong></div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>主图</th>
+                            <th>CTR</th>
+                            <th>CI 下限</th>
+                            <th>CI 上限</th>
+                            <th>可靠性</th>
+                            <th>识别力</th>
+                            <th>判断</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in mab_rows %}
+                        <tr>
+                            <td>{{ row.name }}</td>
+                            <td>{{ '%.2f%%'|format(row.ctr * 100) }}</td>
+                            <td>{{ '%.2f%%'|format(row.ci_low * 100) }}</td>
+                            <td>{{ '%.2f%%'|format(row.ci_high * 100) }}</td>
+                            <td><span class="tag {% if row.reliability == '高可靠' %}tag-good{% elif row.reliability == '中可靠' %}tag-mid{% else %}tag-danger{% endif %}">{{ row.reliability }}</span></td>
+                            <td><span class="tag {% if row.power == '高识别力' %}tag-good{% elif row.power == '中识别力' %}tag-mid{% else %}tag-danger{% endif %}">{{ row.power }}</span></td>
+                            <td>{{ row.name == results.best_variant.name and '👑' or '' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="explain">
+                    <strong>MAB 特征：</strong>所有主图一直均分流量，不管好坏都吃相同的曝光。适合差异大、样本少的场景。<br>
+                    <strong>缺点：</strong>差的主图持续浪费流量，实验时间越长损失越大。
+                </div>
+            </div>
+
+            <div class="panel botw">
+                <h2>🧬 Best of Three Worlds（动态消除）</h2>
+                <div class="metric-row">
+                    <div class="metric"><span>总流量</span><strong>{{ results.total_visitors }}</strong></div>
+                    <div class="metric"><span>消除次数</span><strong>{{ results.summary.elimination_count }}</strong></div>
+                    <div class="metric"><span>{% if results.summary.terminated %}🏁 已终止{% else %}🔄 进行中{% endif %}</span><strong>{{ results.summary.winner_name or '—' }}</strong></div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>主图</th>
+                            <th>累计 CTR</th>
+                            <th>收益下限</th>
+                            <th>收益上限</th>
+                            <th>流量占比</th>
+                            <th>判断</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in results.rows %}
+                        <tr>
+                            <td>
+                                {% if row.name in results.summary.eliminated_names %}
+                                <span class="eliminated">{{ row.name }}</span>
+                                {% elif row.name == results.summary.winner_name %}
+                                <span class="winner">{{ row.name }}</span>
+                                {% else %}
+                                {{ row.name }}
+                                {% endif %}
+                            </td>
+                            <td>{{ '%.2f%%'|format(row.ctr * 100) }}</td>
+                            <td>{{ '%.2f%%'|format(row.gain_low * 100) }}</td>
+                            <td>{{ '%.2f%%'|format(row.gain_high * 100) }}</td>
+                            <td>{{ '%.0f%%'|format(row.mab_share * 100) }}</td>
+                            <td>
+                                {% if row.name in results.summary.eliminated_names %}
+                                <span class="tag tag-danger">已淘汰</span>
+                                {% elif row.name == results.summary.winner_name %}
+                                <span class="tag tag-good">🏆 优胜</span>
+                                {% else %}
+                                <span class="tag tag-mid">竞选中</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="explain">
+                    <strong>BOTW 特征：</strong>从第3天起逐步淘汰差的，把流量倾斜给好的。2臂阶段 60/40 分流。<br>
+                    <strong>优点：</strong>减少机会成本，对抗时间波动，用累计收益而非单日 CTR 判断。
+                </div>
+
+                {% if results.elimination_events %}
+                <div class="explain" style="margin-top: 10px; background: var(--danger-bg);">
+                    <strong>消除事件：</strong><br>
+                    {% for event in results.elimination_events %}
+                    → {{ event.day }}：淘汰 <strong>{{ event.name }}</strong>（{{ event.reason }}）<br>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="explain" style="margin-top: 24px;">
+            <strong>📖 决策建议：</strong><br>
+            · 如果主图数量 ≤ 3 且差异明显 → MAB 就够用<br>
+            · 如果主图数量 ≥ 4 且差异细微 → BOTW 更省流量<br>
+            · 如果你的行业数据波动大（节假日、促销期）→ BOTW 更能抗波动<br>
+            · 如果你想尽早确定优胜者并全量上线 → BOTW 收敛更快<br>
+            <br>
+            <strong>核心差异一句话：</strong>MAB 是"大家一起跑到底"；BOTW 是"逐步淘汰差的、把更多流量给好的"。
+        </div>
+    </div>
+
+    <script>
+        function exportData() {
+            const data = {
+                daily_data: {{ daily_data|tojson }},
+                results_summary: {{ results.summary|tojson }},
+                rows: [
+                    {% for row in results.rows %}
+                    {
+                        name: "{{ row.name }}",
+                        image_type: "{{ row.image_type }}",
+                        visitors: {{ row.visitors }},
+                        clicks: {{ row.clicks }},
+                        ctr: {{ '%.4f'|format(row.ctr) }},
+                        reliability: "{{ row.reliability }}",
+                        power: "{{ row.power }}",
+                        comparison: "{{ row.comparison }}",
+                    }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ecomlab_compare_' + new Date().toISOString().slice(0,10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

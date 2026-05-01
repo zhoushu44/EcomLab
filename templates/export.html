@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>EcomLab 实验报告</title>
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+        }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #222;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        h1 { font-size: 22px; border-bottom: 2px solid #0071e3; padding-bottom: 8px; }
+        h2 { font-size: 16px; margin-top: 24px; color: #0071e3; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px; }
+        th, td { padding: 8px 10px; border: 1px solid #ccc; text-align: center; }
+        th { background: #f0f0f5; font-weight: 600; }
+        .summary { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; }
+        .summary-item { background: #f9f9fb; border-radius: 8px; padding: 12px 18px; min-width: 100px; }
+        .summary-item span { display: block; font-size: 11px; color: #666; }
+        .summary-item strong { display: block; font-size: 18px; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .tag-good { background: #eaf8ee; color: #34c759; }
+        .tag-mid { background: #fff5e6; color: #ff9500; }
+        .tag-danger { background: #fff0ef; color: #ff3b30; }
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: #0071e3;
+            color: #fff;
+            margin: 16px 0;
+        }
+        .btn:hover { opacity: 0.9; }
+        .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #ddd; font-size: 11px; color: #999; text-align: center; }
+    </style>
+</head>
+<body>
+    <button class="btn no-print" onclick="window.print()">🖨️ 打印报告</button>
+
+    <h1>EcomLab 实验报告</h1>
+    <p>生成时间：{{ results.summary.get('_now', '') }}</p>
+
+    <h2>实验总览</h2>
+    <div class="summary">
+        <div class="summary-item"><span>测试天数</span><strong>{{ results.days_count }}</strong></div>
+        <div class="summary-item"><span>总访客数</span><strong>{{ results.total_visitors }}</strong></div>
+        <div class="summary-item"><span>总点击数</span><strong>{{ results.total_clicks }}</strong></div>
+        <div class="summary-item"><span>平均 CTR</span><strong>{{ '%.2f%%'|format(results.average_ctr * 100) }}</strong></div>
+        <div class="summary-item"><span>实验阶段</span><strong>{{ results.summary.phase }}</strong></div>
+    </div>
+
+    <h2>累计结果表</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>主图</th>
+                <th>类型</th>
+                <th>访客数</th>
+                <th>点击数</th>
+                <th>CTR</th>
+                <th>CI 下限</th>
+                <th>CI 上限</th>
+                <th>可靠性</th>
+                <th>识别力</th>
+                <th>流量占比</th>
+                <th>判断</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in results.rows %}
+            <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.image_type }}</td>
+                <td>{{ row.visitors }}</td>
+                <td>{{ row.clicks }}</td>
+                <td>{{ '%.2f%%'|format(row.ctr * 100) }}</td>
+                <td>{{ '%.2f%%'|format(row.ci_low * 100) }}</td>
+                <td>{{ '%.2f%%'|format(row.ci_high * 100) }}</td>
+                <td><span class="tag {% if row.reliability == '高可靠' %}tag-good{% elif row.reliability == '中可靠' %}tag-mid{% else %}tag-danger{% endif %}">{{ row.reliability }}</span></td>
+                <td><span class="tag {% if row.power == '高识别力' %}tag-good{% elif row.power == '中识别力' %}tag-mid{% else %}tag-danger{% endif %}">{{ row.power }}</span></td>
+                <td>{{ '%.0f%%'|format(row.mab_share * 100) }}</td>
+                <td>{{ row.comparison }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if results.elimination_events %}
+    <h2>消除事件</h2>
+    <table>
+        <thead><tr><th>序号</th><th>日期</th><th>被消除主图</th><th>原因</th></tr></thead>
+        <tbody>
+            {% for event in results.elimination_events %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ event.day }}</td>
+                <td>{{ event.name }}</td>
+                <td>{{ event.reason }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h2>结论与建议</h2>
+    <p>优胜主图：<strong>{{ results.summary.winner_name or '暂未确定' }}</strong></p>
+    <p>{{ results.summary.termination_text }}</p>
+    <p>{{ results.summary.mab_conclusion }}</p>
+
+    <div class="footer">EcomLab · 自适应实验工具 · 基于 Best of Three Worlds 论文</div>
+</body>
+</html>

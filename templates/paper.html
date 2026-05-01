@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>电商主图 MAB 测试系统 - 每日数据</title>
+    <title>Best of Three Worlds Adaptive Experimentation - 测试方法页</title>
     <style>
         :root {
             color-scheme: light;
@@ -110,21 +110,35 @@
         .hero {
             background: linear-gradient(135deg, #eff6ff, #ffffff);
             border: 1px solid var(--border);
-            border-radius: 22px;
-            padding: 30px;
+            border-radius: 24px;
+            padding: 32px;
             margin-bottom: 24px;
             box-shadow: 0 12px 28px rgba(37, 99, 235, 0.08);
         }
 
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: var(--primary-deep);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
         .hero h1 {
-            margin: 0 0 12px;
+            margin: 16px 0 12px;
             font-size: 34px;
+            line-height: 1.25;
         }
 
         .hero p {
-            margin: 6px 0;
+            margin: 8px 0;
             color: var(--muted);
-            line-height: 1.75;
+            line-height: 1.8;
+            font-size: 15px;
         }
 
         .hero-badges {
@@ -160,10 +174,58 @@
             font-size: 22px;
         }
 
-        .card h3 {
-            margin: 0 0 14px;
-            font-size: 18px;
-            color: #374151;
+        .card-intro {
+            color: var(--muted);
+            line-height: 1.8;
+            margin-bottom: 18px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .metric {
+            border-radius: 14px;
+            padding: 16px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+        }
+
+        .metric span {
+            display: block;
+            color: var(--muted);
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .metric strong {
+            font-size: 22px;
+        }
+
+        .phase-box {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            align-items: center;
+            padding: 16px 18px;
+            border-radius: 16px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .phase-label {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .phase-value {
+            font-size: 22px;
+            font-weight: 700;
         }
 
         .daily-section {
@@ -240,78 +302,6 @@
         .btn-secondary {
             background: var(--primary-soft);
             color: var(--primary);
-        }
-
-        .btn-add {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .summary {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 14px;
-            margin-bottom: 18px;
-        }
-
-        .metric {
-            border-radius: 14px;
-            padding: 16px;
-            background: #f8fafc;
-            border: 1px solid var(--border);
-        }
-
-        .metric span {
-            display: block;
-            color: var(--muted);
-            margin-bottom: 6px;
-            font-size: 13px;
-        }
-
-        .metric strong {
-            font-size: 22px;
-        }
-
-        .phase-box {
-            display: flex;
-            justify-content: space-between;
-            gap: 14px;
-            align-items: center;
-            padding: 16px 18px;
-            border-radius: 16px;
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            margin-bottom: 16px;
-        }
-
-        .phase-label {
-            font-size: 13px;
-            color: var(--muted);
-            margin-bottom: 6px;
-        }
-
-        .phase-value {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 12px 10px;
-            border-bottom: 1px solid var(--border);
-            vertical-align: top;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #374151;
         }
 
         .tag {
@@ -436,19 +426,6 @@
             line-height: 1.8;
         }
 
-        .paper-box {
-            margin-top: 18px;
-            padding: 16px;
-            background: #eff6ff;
-            border-radius: 14px;
-            border: 1px solid #bfdbfe;
-            line-height: 1.8;
-        }
-
-        .paper-box strong {
-            color: var(--primary-deep);
-        }
-
         .decision-board {
             display: grid;
             gap: 14px;
@@ -519,24 +496,51 @@
             background: var(--primary-soft);
             border-radius: 4px 4px 0 0;
             min-height: 4px;
-            position: relative;
         }
 
         .trend-bar.highest {
             background: var(--primary);
         }
 
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #374151;
+        }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .mini-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
         @media (max-width: 1024px) {
-            .summary {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+            .summary,
+            .bottom-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
 
         @media (max-width: 720px) {
-            .summary {
-                grid-template-columns: 1fr;
-            }
-
             .container {
                 padding: 18px 12px 36px;
             }
@@ -545,11 +549,12 @@
                 font-size: 26px;
             }
 
-            .phase-box {
-                flex-direction: column;
-                align-items: flex-start;
+            .summary,
+            .bottom-grid {
+                grid-template-columns: 1fr;
             }
 
+            .phase-box,
             .daily-header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -574,40 +579,43 @@
             <details class="page-switcher">
                 <summary>测试方法切换</summary>
                 <div class="page-menu">
-                    <a class="page-option active" href="/">MAB 多臂老虎机</a>
-                    <a class="page-option" href="/paper">Best of Three Worlds 自适应实验</a>
+                    <a class="page-option" href="/">MAB 多臂老虎机</a>
+                    <a class="page-option active" href="/paper">Best of Three Worlds 自适应实验</a>
                     <a class="page-option" href="/compare">左右对比</a>
                 </div>
             </details>
         </div>
 
         <section class="hero">
-            <h1>MAB 多臂老虎机方法页</h1>
-            <p>按照规范支持按天录入每个变体的访客数和点击数，自动累计计算整体数据、置信区间、可靠性和统计功效。</p>
+            <span class="eyebrow">Best of Three Worlds</span>
+            <h1>自适应实验方法页</h1>
+            <p>这个方法页不是纯阅读页，而是可以直接填写每日访客与点击数据、自动计算累计 CTR、累计收益、置信区间、可靠性和统计功效的实验工作台。</p>
+            <p>与 MAB 多臂老虎机的固定均分不同，这里更强调动态分流、持续探索、累计收益判断和减少机会成本。你可以把它当作论文思想的落地版输入面板。</p>
             <div class="hero-badges">
-                <span class="badge">多天数据录入</span>
-                <span class="badge">累计 CTR 计算</span>
-                <span class="badge">置信区间</span>
-                <span class="badge">统计功效</span>
+                <span class="badge">动态流量分配</span>
+                <span class="badge">持续证据更新</span>
+                <span class="badge">区间重叠判断</span>
+                <span class="badge">论文落地计算</span>
             </div>
         </section>
 
         <section class="card">
             <h2>每日主图测试数据</h2>
+            <p class="card-intro">按天填写每个变体的数据。系统会按累计口径重新计算所有指标，帮助你观察 Best of Three Worlds 的动态分流效果。</p>
             <form method="post" enctype="multipart/form-data" id="data-form">
                 <input type="hidden" name="experiment_id" id="experiment_id" value="{{ experiment_id }}">
                 <input type="hidden" name="experiment_title" id="experiment_title_hidden" value="{{ experiment_title }}">
                 <div class="actions">
                     <input type="text" id="experiment_title_input" value="{{ experiment_title }}" placeholder="输入实验名称..." style="padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; width: 200px; font-size: 13px;">
                     <button class="btn btn-secondary" type="button" onclick="addNewDay()">添加新日期</button>
-                    <button class="btn btn-secondary" type="button" onclick="window.location.href='/'">恢复默认样例</button>
-                    <button class="btn btn-secondary" type="button" onclick="exportData()" title="导出实验数据为 JSON 文件">导出 JSON</button>
+                    <button class="btn btn-secondary" type="button" onclick="window.location.href='/paper'">恢复默认样例</button>
+                    <button class="btn btn-secondary" type="button" onclick="exportData()">导出 JSON</button>
                     {% if experiment_id %}<button class="btn btn-secondary" type="button" onclick="window.open('/compare','_blank')">左右对比</button>{% endif %}
                 </div>
                 {% if experiments %}
                 <div style="margin-bottom: 12px; font-size: 12px;">
                     <strong>已保存实验：</strong>
-                    <select onchange="if(this.value)window.location.href='/?id='+this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border);">
+                    <select onchange="if(this.value)window.location.href='/paper?id='+this.value" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border);">
                         <option value="">— 选择加载 —</option>
                         {% for exp in experiments %}
                         <option value="{{ exp.id }}" {% if exp.id == experiment_id %}selected{% endif %}>{{ exp.title }} ({{ exp.updated_at }})</option>
@@ -627,7 +635,7 @@
                             </div>
                             <div style="display: flex; gap: 8px;">
                                 {% if day_index == 0 %}
-                                <button type="button" class="btn btn-secondary" onclick="addVariantRow()" style="padding: 6px 12px; font-size: 12px;">+ 添加主图</button>
+                                <button type="button" class="btn btn-secondary" onclick="addVariantRow()" style="padding: 6px 12px; font-size: 12px;">+ 添加变体</button>
                                 {% endif %}
                                 <button type="button" class="btn btn-secondary" onclick="removeDay(this)" style="padding: 6px 12px; font-size: 12px;">删除</button>
                             </div>
@@ -636,8 +644,8 @@
                             <thead>
                                 <tr>
                                     <th>主图预览</th>
-                                    <th>主图编号</th>
-                                    <th>主图类型</th>
+                                    <th>变体编号</th>
+                                    <th>变体类型</th>
                                     <th>访客数</th>
                                     <th>点击数</th>
                                     <th>当日点击率</th>
@@ -682,11 +690,6 @@
                     <button class="btn btn-primary" type="submit">计算累计结果</button>
                 </div>
             </form>
-
-            <div class="paper-box">
-                <strong>论文落地提醒：</strong>
-                每天录入数据后，系统会自动累计所有天数的数据进行分析。随着数据积累，置信区间会逐渐收窄，检测功效会提升，这时才能更准确地判断主图好坏。
-            </div>
         </section>
 
         <section class="card">
@@ -729,18 +732,20 @@
             {% if results.best_variant %}
             <div class="decision-board">
                 <div class="decision-card highlight">
-                    <div class="decision-title">当前 MAB 重点推荐</div>
+                    <div class="decision-title">当前自适应实验重点推荐</div>
                     <div class="decision-main">{{ results.best_variant.name }}</div>
                     <div class="decision-desc">
-                        主图类型：{{ results.best_variant.image_type }}<br>
+                        变体类型：{{ results.best_variant.image_type }}<br>
                         建议动态流量占比：{{ '%.2f%%'|format(results.best_variant.mab_share * 100) }}<br>
                         当前判断：{{ results.best_variant.comparison }}
                     </div>
                 </div>
-
                 <div class="decision-card">
-                    <div class="decision-title">MAB 决策视角</div>
-                    <div class="decision-desc">{{ results.summary.mab_conclusion }}</div>
+                    <div class="decision-title">方法论结论</div>
+                    <div class="decision-desc">
+                        固定均分逻辑：{{ results.summary.ab_conclusion }}<br>
+                        自适应逻辑：{{ results.summary.mab_conclusion }}
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -748,6 +753,7 @@
 
         <section class="card">
             <h2>每日点击率趋势</h2>
+            <p class="card-intro">每个变体按天展示 CTR 趋势，最高点击率日会被高亮，便于看出是否只是短期波动还是持续优势。</p>
             {% for row in results.rows %}
             <div class="trend-card">
                 <div class="trend-header">
@@ -759,11 +765,7 @@
                 </div>
                 <div class="trend-bars">
                     {% for day in row.daily %}
-                    <div 
-                        class="trend-bar {% if day.is_highest %}highest{% endif %}" 
-                        style="height: {{ day.bar_height }}%"
-                        title="{{ day.date }}: {{ '%.2f%%'|format(day.ctr * 100) }}"
-                    ></div>
+                    <div class="trend-bar {% if day.is_highest %}highest{% endif %}" style="height: {{ day.bar_height }}%" title="{{ day.date }}: {{ '%.2f%%'|format(day.ctr * 100) }}"></div>
                     {% endfor %}
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--muted);">
@@ -776,11 +778,12 @@
         </section>
 
         <section class="card">
-            <h2>结果表与推荐动作</h2>
+            <h2>自适应实验结果表</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>主图编号</th>
+                        <th>变体编号</th>
+                        <th>变体类型</th>
                         <th>累计点击率</th>
                         <th>
                             CI 下限
@@ -789,8 +792,8 @@
                                 <span class="tooltip-content">
                                     <span class="tooltip-arrow"></span>
                                     <h4>CI 下限</h4>
-                                    <p>点击率的最小可能值（95%概率范围内）。数值越高说明下限越稳。</p>
-                                    <div class="formula">下限 = 点击率 - 1.96 × √(点击率×(1-点击率)/访客数)</div>
+                                    <p>点击率的最小可能值（95% 概率范围内）。</p>
+                                    <div class="formula">下限 = CTR - 1.96 × √(CTR×(1-CTR)/访客数)</div>
                                 </span>
                             </span>
                         </th>
@@ -801,8 +804,8 @@
                                 <span class="tooltip-content">
                                     <span class="tooltip-arrow"></span>
                                     <h4>CI 上限</h4>
-                                    <p>点击率的最大可能值（95%概率范围内）。数值越高说明上限越高。</p>
-                                    <div class="formula">上限 = 点击率 + 1.96 × √(点击率×(1-点击率)/访客数)</div>
+                                    <p>点击率的最大可能值（95% 概率范围内）。</p>
+                                    <div class="formula">上限 = CTR + 1.96 × √(CTR×(1-CTR)/访客数)</div>
                                 </span>
                             </span>
                         </th>
@@ -813,66 +816,105 @@
                                 <span class="tooltip-content">
                                     <span class="tooltip-arrow"></span>
                                     <h4>区间宽度</h4>
-                                    <p>上限减下限的差值。宽度越小，说明数据越稳定可靠。</p>
+                                    <p>上限减下限的差值，宽度越小说明结果越稳定。</p>
                                     <div class="formula">宽度 = CI上限 - CI下限</div>
                                 </span>
                             </span>
                         </th>
                         <th>
-                            数据可靠等级
+                            累计收益率
                             <span class="tooltip-wrapper">
                                 <span class="tooltip-icon">?</span>
                                 <span class="tooltip-content">
                                     <span class="tooltip-arrow"></span>
-                                    <h4>数据可靠等级</h4>
-                                    <p>根据区间宽度判断数据靠谱程度：</p>
-                                    <p>- 高可靠：宽度 < 5%</p>
-                                    <p>- 中可靠：5% ≤ 宽度 < 10%</p>
+                                    <h4>累计收益率</h4>
+                                    <p>相对所有主图当前平均水平的收益差值。</p>
+                                    <div class="formula">收益率 = 当前 CTR - 当前平均 CTR</div>
+                                </span>
+                            </span>
+                        </th>
+                        <th>
+                            收益下限
+                            <span class="tooltip-wrapper">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-content">
+                                    <span class="tooltip-arrow"></span>
+                                    <h4>收益下限</h4>
+                                    <p>累计收益的保守估计下界。</p>
+                                    <div class="formula">收益下限 = 收益率 - 序贯误差</div>
+                                </span>
+                            </span>
+                        </th>
+                        <th>
+                            收益上限
+                            <span class="tooltip-wrapper">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-content">
+                                    <span class="tooltip-arrow"></span>
+                                    <h4>收益上限</h4>
+                                    <p>累计收益的保守估计上界。</p>
+                                    <div class="formula">收益上限 = 收益率 + 序贯误差</div>
+                                </span>
+                            </span>
+                        </th>
+                        <th>
+                            收益宽度
+                            <span class="tooltip-wrapper">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-content">
+                                    <span class="tooltip-arrow"></span>
+                                    <h4>收益宽度</h4>
+                                    <p>收益区间的跨度。</p>
+                                    <div class="formula">收益宽度 = 收益上限 - 收益下限</div>
+                                </span>
+                            </span>
+                        </th>
+                        <th>
+                            可靠等级
+                            <span class="tooltip-wrapper">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-content">
+                                    <span class="tooltip-arrow"></span>
+                                    <h4>可靠等级</h4>
+                                    <p>根据区间宽度判断：</p>
+                                    <p>- 高可靠：宽度 &lt; 5%</p>
+                                    <p>- 中可靠：5% ≤ 宽度 &lt; 10%</p>
                                     <p>- 低可靠：宽度 ≥ 10%</p>
                                 </span>
                             </span>
                         </th>
                         <th>
-                            检测功效等级
+                            功效等级
                             <span class="tooltip-wrapper">
                                 <span class="tooltip-icon">?</span>
                                 <span class="tooltip-content">
                                     <span class="tooltip-arrow"></span>
-                                    <h4>检测功效等级</h4>
-                                    <p>判断能否真实测出主图好坏的能力：</p>
-                                    <p>- 高识别力：访客数 > 500</p>
-                                    <p>- 中识别力：200 < 访客数 ≤ 500</p>
+                                    <h4>功效等级</h4>
+                                    <p>判断当前样本是否足以看出差异：</p>
+                                    <p>- 高识别力：访客数 &gt; 500</p>
+                                    <p>- 中识别力：200 &lt; 访客数 ≤ 500</p>
                                     <p>- 低识别力：访客数 ≤ 200</p>
                                 </span>
                             </span>
                         </th>
-                        <th>
-                            与最优图比较
-                            <span class="tooltip-wrapper">
-                                <span class="tooltip-icon">?</span>
-                                <span class="tooltip-content">
-                                    <span class="tooltip-arrow"></span>
-                                    <h4>与最优图比较</h4>
-                                    <p>根据置信区间判断当前图与最好图的差距：</p>
-                                    <p>- 显著领先：区间完全高于其他图</p>
-                                    <p>- 暂时领先：当前最高但区间有重叠</p>
-                                    <p>- 结果未拉开：区间重叠较多</p>
-                                    <p>- 显著落后：区间完全低于最好图</p>
-                                </span>
-                            </span>
-                        </th>
+                        <th>与最佳图比较</th>
                         <th>动态流量占比</th>
-                        <th>流量调整建议</th>
+                        <th>流量建议</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in results.rows %}
                     <tr>
                         <td>{{ row.name }}</td>
+                        <td>{{ row.image_type }}</td>
                         <td>{{ '%.2f%%'|format(row.ctr * 100) }}</td>
                         <td>{{ '%.2f%%'|format(row.ci_low * 100) }}</td>
                         <td>{{ '%.2f%%'|format(row.ci_high * 100) }}</td>
                         <td>{{ '%.2f%%'|format(row.ci_width * 100) }}</td>
+                        <td>{{ '%.2f%%'|format(row.gain_rate * 100) }}</td>
+                        <td>{{ '%.2f%%'|format(row.gain_low * 100) }}</td>
+                        <td>{{ '%.2f%%'|format(row.gain_high * 100) }}</td>
+                        <td>{{ '%.2f%%'|format(row.gain_width * 100) }}</td>
                         <td>
                             <span class="tag {% if row.reliability == '高可靠' %}tag-good{% elif row.reliability == '中可靠' %}tag-mid{% else %}tag-danger{% endif %}">{{ row.reliability }}</span>
                         </td>
@@ -891,83 +933,134 @@
         </section>
 
         <section class="card">
-            <h2>按照论文使用说明</h2>
+            <h2>消除与流量分配轨迹</h2>
+            <p class="card-intro">这里展示每一天的探索、消除与重新分配过程，对应你提供的第 1-2 天探索、第 3 天首次消除、第 5 天二次消除、第 7 天终止的逻辑。</p>
+            {% for step in results.experiment_trace %}
+            <div class="trend-card">
+                <div class="trend-header">
+                    <span class="trend-name">{{ step.day_label }}（{{ step.date }}）</span>
+                    <span class="trend-ctr">{{ step.termination_text }}</span>
+                </div>
+                <div class="decision-desc">
+                    当前活跃主图：{{ step.active_before_text }}<br>
+                    分配模式：{{ step.allocation_mode }}<br>
+                    当前基准：{{ step.baseline_text }}<br>
+                    消除结果：{{ step.eliminated_text }}<br>
+                    次日分配：{{ step.allocation_text }}<br>
+                    消除后主图：{{ step.active_after_text }}<br>
+                    决策结论：{{ step.decision_text }}
+                </div>
+            </div>
+            {% endfor %}
+            {% if results.elimination_events %}
             <div class="explain">
-                1. <strong>每天录入数据</strong>：在上方表格中填写每张主图当天的访客数和点击数。<br>
-                2. <strong>观察趋势</strong>：查看每日点击率趋势图，了解各主图效果的稳定性。<br>
-                3. <strong>关注置信区间</strong>：随着数据积累，区间会逐渐变窄，数据会从低可靠→中可靠→高可靠变化。<br>
-                4. <strong>等待识别力提升</strong>：当样本量足够大（访客数>500），检测功效会达到高识别力。<br>
-                5. <strong>做出决策</strong>：当某张图同时具备高可靠+高识别力，且与其他图区间不重叠时，可进入上线判断。<br>
-                6. <strong>持续优化</strong>：根据 MAB 建议动态调整流量，让好图获得更多曝光。
+                <strong>消除事件汇总</strong><br>
+                {% for event in results.elimination_events %}
+              第 {{ loop.index }} 次消除：<span data-eliminated-name="{{ event.name }}">{{ event.name }}</span>，原因：{{ event.reason }}<br>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="explain">
+                <strong>终止条件</strong><br>
+                {{ results.summary.termination_text }}<br>
+                {{ results.summary.paper_hint }}
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Best of Three Worlds 的操作建议</h2>
+            <div class="bottom-grid">
+                <div class="explain">
+                    1. 每天录入数据，不要只看单天结果。<br>
+                    2. 观察趋势图，判断领先是否稳定。<br>
+                    3. 关注置信区间收窄情况。<br>
+                    4. 等待功效提升后再做强结论。<br>
+                    5. 根据动态流量占比逐步倾斜。<br>
+                    6. 保留少量探索流量，避免过早淘汰。
+                </div>
+                <div class="explain">
+                    <strong>论文核心提醒</strong><br>
+                    自适应实验不是单纯追求短期最高 CTR，而是要在识别优胜者、减少机会成本、保持稳健性之间做平衡。<br><br>
+                    适合的决策信号是：高可靠、高识别力、区间不重叠。
+                </div>
             </div>
         </section>
 
         <section class="card" style="background: var(--bg-paper); border-left: 4px solid var(--accent);">
-            <h2>MAB 多臂老虎机 小白解读</h2>
+            <h2>论文小白解读：Best of Three Worlds 到底在说什么</h2>
 
             <div class="explain" style="font-size: 15px; line-height: 2;">
                 <strong>一句话版：</strong><br>
-                MAB (Multi-Armed Bandit) 是一种"边测试边调整"的 A/B 测试方法。
-                不像传统测试那样大家平分流量死等结果，而是根据实时数据动态地把更多流量分配给表现好的主图。
+                这篇论文教我们怎么做"聪明"的 A/B 测试——
+                不是平分流量傻等，而是边测试边淘汰差的、把流量倾斜给好的，同时还要保证结论是靠谱的、不会被短期波动骗了。
             </div>
 
             <div class="bottom-grid" style="margin-top: 20px;">
                 <div class="explain">
-                    <strong>多臂老虎机 这个名字哪来的？</strong><br><br>
-                    想象你面前有一排老虎机（每个主图就是一台机器）：<br><br>
-                    你不知道哪台机器中奖率高。<br>
-                    你只能通过"试玩"来积累经验。<br>
-                    试玩的过程就是"花硬币"（消耗流量）。<br><br>
-                    你要做的是：<br>
-                    在"试新机器"（探索）和"玩最赚的机器"（利用）之间找到最优平衡。<br><br>
-                    这个工具页用的 MAB 算法基于 UCB（上置信界），<br>
-                    通过 CTR + 探索奖励来决定怎么分配流量。
+                    <strong>三个"世界"分别是什么？</strong><br><br>
+                    论文说的"Three Worlds"是自适应实验要同时搞定的三件事：<br><br>
+                    <span style="color: var(--accent);">世界一 · 找出真正最好的那个</span><br>
+                    也叫"counterfactual best treatment identification"。<br>
+                    简单说就是：实验结束时，你得有把握说"主图 B 确实是最好的"，而不是靠猜。<br><br>
+                    <span style="color: var(--accent);">世界二 · 减少机会成本</span><br>
+                    测试期间，差的主图在浪费流量 = 少赚了钱。<br>
+                    所以要尽早把流量从差的图撤走，多分配给好的图。<br><br>
+                    <span style="color: var(--accent);">世界三 · 应对时间变化</span><br>
+                    用户喜好会变、节假日会影响数据。<br>
+                    算法不能假设"今天和昨天的规律一样"，要能适应数据的波动。
                 </div>
                 <div class="explain">
-                    <strong>MAB 和传统 A/B 测试的区别</strong><br><br>
-                    <span style="color: var(--good);">传统 A/B 测试：</span><br>
-                    · 所有版本平分流量从头到尾<br>
-                    · 等到样本量够了才下结论<br>
-                    · 差的版本一直在浪费流量<br><br>
-                    <span style="color: var(--accent);">MAB 多臂老虎机：</span><br>
-                    · 实时根据表现动态调整流量<br>
-                    · 好的版本越跑越多流量<br>
-                    · 差的版本保留少量探索即可<br><br>
-                    <strong>节省的流量 = 省下的钱。</strong>
+                    <strong>这个工具页对应的论文逻辑</strong><br><br>
+                    <strong>第 1-2 天（探索期）：</strong><br>
+                    所有主图均分流量，先积累基础数据。<br>
+                    为什么？——数据太少的时候，任何判断都不可靠。<br><br>
+                    <strong>第 3 天起（首次消除）：</strong><br>
+                    用"累计收益区间"来判断：<br>
+                    如果某张图的收益上界，比最好那张图的收益下界还低，<br>
+                    说明它"大概率就是差"，可以淘汰。<br><br>
+                    <strong>缩减到 2 臂后（倾斜分流）：</strong><br>
+                    不立即淘汰到只剩 1 个，而是 60/40 分配。<br>
+                    为什么留 40% 给弱的？——要保留验证能力，防止误判。<br><br>
+                    <strong>终止条件：</strong><br>
+                    当最好那张图的收益下界，高于所有其他图的上界，<br>
+                    且置信度够了 → 全流量上线。
                 </div>
             </div>
 
             <div class="bottom-grid" style="margin-top: 20px;">
                 <div class="explain">
-                    <strong>什么是"探索奖励"？</strong><br><br>
-                    UCB 算法的核心公式大致是：<br>
-                    <code>分数 = CTR + sqrt(2 × ln(总流量) / 该变体流量)</code><br><br>
-                    后半部分就是"探索奖励"：<br>
-                    · 流量少的变体 → 探索奖励高 → 还有机会被分配流量<br>
-                    · 流量多的变体 → 探索奖励低 → 靠真实 CTR 说话<br><br>
-                    这保证了不会因为早期运气就过早放弃某个变体。
+                    <strong>什么叫"累计收益"而不只看 CTR？</strong><br><br>
+                    单看 CTR 容易误判：<br>
+                    比如主图 A 第一天 CTR 高，可能是因为运气好。<br><br>
+                    累计收益 = 每个变体的 CTR - 当前所有变体的平均 CTR<br><br>
+                    这样做的好处：<br>
+                    · 自然消除了"整体涨跌"的影响<br>
+                    · 能看出一个变体是持续好还是偶然好<br>
+                    · 配合收益区间判断，不会因为一天的好坏就乱淘汰
                 </div>
                 <div class="explain">
-                    <strong>MAB 适合什么场景？</strong><br><br>
-                    ✅ 变体数量 ≤ 3 个<br>
-                    ✅ 各变体差异比较明显<br>
-                    ✅ 想尽快把流量切给好的<br>
-                    ✅ 不需要严格的统计显著性检验<br><br>
-                    ❌ 不太适合：<br>
-                    · 变体很多且差异细微（→ 用 BOTW）<br>
-                    · 数据波动大的行业<br>
-                    · 需要严格的 winner 判定
+                    <strong>消除规则为什么不能太激进？</strong><br><br>
+                    论文里强调：过早淘汰 = 可能把好的误杀了。<br><br>
+                    这个工具用的判断方式：<br>
+                    · 不是比单天 CTR 高低<br>
+                    · 不是比累计CTR 谁大谁小<br>
+                    · 而是看"收益区间是否完全分离"<br><br>
+                    只有当前最好的下界，比被淘汰者的上界还高，<br>
+                    说明"不重叠了、差距够稳了"，才执行消除。<br><br>
+                    这就是"always-valid inference"的落地方式：<br>
+                    结论要经得起随时间验证，而不是赌一把。
                 </div>
             </div>
 
             <div class="explain" style="margin-top: 20px; font-size: 14px; line-height: 2.2;">
-                <strong>用这个工具的标准流程：</strong><br><br>
-                <span style="color: var(--accent);">STEP 1</span> — 第 1 天上传测试图片，填写每个变体的访客数和点击数。<br>
-                <span style="color: var(--accent);">STEP 2</span> — 每天新增一个日期行，录入新一天的数据。<br>
-                <span style="color: var(--accent);">STEP 3</span> — 点"计算累计结果"，观察置信区间是否收窄。<br>
-                <span style="color: var(--accent);">STEP 4</span> — 当某个变体达到"高可靠 + 高识别力"，且领先明显 → 可做上线判断。<br>
-                <span style="color: var(--accent);">STEP 5</span> — 用"保存到数据库"存下来，方便后续加载继续分析。<br><br>
-                <em>MAB 的核心优势：不用等到所有变体都跑够样本，好图可以提前拿到更多流量。</em>
+                <strong>用这个工具的标准流程（跟着论文走）：</strong><br><br>
+                <span style="color: var(--accent);">STEP 1</span> — 第 1 天上传测试图片，录入首日数据（访客数 + 点击数）。<br>
+                <span style="color: var(--accent);">STEP 2</span> — 第 2 天继续均分探索，录入第 2 天数据，点"计算累计结果"。<br>
+                <span style="color: var(--accent);">STEP 3</span> — 第 3 天起，观察"消除与流量分配轨迹"，看有没有变体被标记淘汰。<br>
+                <span style="color: var(--accent);">STEP 4</span> — 如果有淘汰发生，新增日期时会自动隐藏已淘汰的变体。<br>
+                <span style="color: var(--accent);">STEP 5</span> — 当只剩 2 个变体时，观察 60/40 倾斜分流后的趋势。<br>
+                <span style="color: var(--accent);">STEP 6</span> — 当最好变体的收益区间完全碾压其他所有变体，实验终止，全流量上线。<br><br>
+                <em>记住：不要因为一天的好或坏就急着下结论。论文的核心精神就是"让数据积累到足够说服力"。</em>
             </div>
         </section>
     </div>
@@ -986,24 +1079,24 @@
             const firstSection = document.querySelector('.daily-section');
             if (!firstSection) {
                 return [
-                    { name: '主图1', type: '白底图', path: '' },
-                    { name: '主图2', type: '场景图', path: '' }
+                    { name: '变体1', type: '控制组', path: '' },
+                    { name: '变体2', type: '实验组A', path: '' }
                 ];
             }
             const rows = firstSection.querySelectorAll('tbody tr');
+            const eliminatedNames = new Set(Array.from(document.querySelectorAll('[data-eliminated-name]')).map((item) => item.dataset.eliminatedName));
             return Array.from(rows).map((row, index) => {
                 const inputs = row.querySelectorAll('input');
                 return {
                     path: inputs[0] ? inputs[0].value : '',
-                    name: inputs[2] ? inputs[2].value || `主图${index + 1}` : `主图${index + 1}`,
+                    name: inputs[2] ? inputs[2].value || `变体${index + 1}` : `变体${index + 1}`,
                     type: inputs[3] ? inputs[3].value || '未分类' : '未分类'
                 };
-            });
+            }).filter((item) => !eliminatedNames.has(item.name));
         }
 
         function buildDayTR(name, type, path, isFirstDay, editable) {
             const ro = editable ? '' : 'readonly';
-            const hidden = editable ? '' : 'style="display:none;"';
             let html = '<tr>';
             html += '<td>';
             if (path) {
@@ -1036,7 +1129,7 @@
             sections.forEach((section, sIdx) => {
                 const isFirstDay = (sIdx === 0);
                 const tbody = section.querySelector('tbody');
-                tbody.insertAdjacentHTML('beforeend', buildDayTR(`主图${newIndex}`, '未分类', '', isFirstDay, isFirstDay));
+                tbody.insertAdjacentHTML('beforeend', buildDayTR(`变体${newIndex}`, '未分类', '', isFirstDay, isFirstDay));
             });
             updateInputNames();
         }
@@ -1062,7 +1155,6 @@
             const daySection = document.createElement('div');
             daySection.className = 'daily-section';
             
-            const lastDay = containers.lastElementChild;
             let innerHTML = `
                 <div class="daily-header">
                     <div>
@@ -1075,8 +1167,8 @@
                     <thead>
                         <tr>
                             <th>主图预览</th>
-                            <th>主图编号</th>
-                            <th>主图类型</th>
+                            <th>变体编号</th>
+                            <th>变体类型</th>
                             <th>访客数</th>
                             <th>点击数</th>
                             <th>当日点击率</th>
@@ -1084,25 +1176,20 @@
                     </thead>
                     <tbody>
             `;
-            
+
             variantRows.forEach((item) => {
                 innerHTML += buildDayTR(item.name, item.type, item.path, false, false);
             });
-            
-            innerHTML += `
-                    </tbody>
-                </table>
-            `;
+
+            innerHTML += `</tbody></table>`;
             daySection.innerHTML = innerHTML;
             containers.appendChild(daySection);
-            
             updateInputNames();
         }
 
         function removeDay(button) {
             const daySection = button.parentElement.parentElement;
             const containers = document.getElementById('daily-containers');
-            
             if (containers.children.length > 1) {
                 containers.removeChild(daySection);
                 updateDayNumbers();
@@ -1126,10 +1213,7 @@
                 const dateInput = section.querySelector('input[name="date[]"]');
                 const date = dateInput ? dateInput.value || `2024-01-${String(dayIndex + 1).padStart(2, '0')}` : `2024-01-${String(dayIndex + 1).padStart(2, '0')}`;
                 const prefix = date.replace(/-/g, '');
-                
-                const table = section.querySelector('table');
-                const rows = table.querySelectorAll('tbody tr');
-                
+                const rows = section.querySelectorAll('tbody tr');
                 rows.forEach((row) => {
                     const inputs = row.querySelectorAll('input');
                     inputs[0].name = `${prefix}_image_path[]`;
