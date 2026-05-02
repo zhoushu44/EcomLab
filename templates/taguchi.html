@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>田口正交实验设计</title>
+    <style>
+        :root {
+            --bg: #f3f6fb;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #059669;
+            --primary-deep: #047857;
+            --primary-soft: #d1fae5;
+            --good: #16a34a;
+            --warn: #d97706;
+            --danger: #dc2626;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        .container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 28px 20px 60px;
+        }
+        .topbar {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 16px;
+        }
+        .page-switcher {
+            position: relative;
+            display: inline-block;
+            padding: 10px 14px;
+            background: rgba(255,255,255,.82);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, .05);
+        }
+        .page-switcher summary {
+            list-style: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+        .page-switcher summary::-webkit-details-marker { display: none; }
+        .page-switcher summary::after {
+            content: '▾';
+            color: var(--primary);
+            font-size: 12px;
+        }
+        .page-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 240px;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 16px 30px rgba(15, 23, 42, .12);
+            overflow: hidden;
+            z-index: 20;
+        }
+        .page-option {
+            padding: 11px 14px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 14px;
+        }
+        .page-option:hover, .page-option.active {
+            background: var(--primary-soft);
+            color: var(--primary-deep);
+        }
+        .hero, .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, .04);
+        }
+        .hero {
+            padding: 30px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ecfdf5, #fff);
+        }
+        .hero h1 {
+            margin: 14px 0 10px;
+            font-size: 34px;
+        }
+        .hero p {
+            margin: 8px 0;
+            line-height: 1.8;
+            color: var(--muted);
+        }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: var(--primary-soft);
+            color: var(--primary-deep);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .hero-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #ecfdf5;
+            color: #065f46;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .card {
+            padding: 22px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            margin: 0 0 14px;
+            font-size: 22px;
+        }
+        .intro {
+            color: var(--muted);
+            line-height: 1.8;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 18px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-deep); }
+        .btn-secondary { background: #f3f4f6; color: var(--text); }
+        .btn-secondary:hover { background: #e5e7eb; }
+        .btn-danger { background: #fee2e2; color: #991b1b; }
+        details.fold {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #fff;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        details.fold[open] {
+            box-shadow: 0 8px 20px rgba(15, 23, 42, .05);
+        }
+        details.fold > summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 16px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            background: #f8fafc;
+        }
+        details.fold > summary::-webkit-details-marker { display: none; }
+        .fold-body { padding: 18px; }
+        .summary-note { color: var(--muted); font-size: 13px; font-weight: 500; }
+        .grid-3, .grid-4 {
+            display: grid;
+            gap: 14px;
+        }
+        .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .metric {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            background: #f8fafc;
+        }
+        .metric span {
+            display: block;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .metric strong {
+            font-size: 28px;
+        }
+        .factor-card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            background: #fcfffd;
+        }
+        .factor-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .factor-levels {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .factor-level-row {
+            display: grid;
+            grid-template-columns: 120px 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 9px 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 12px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        th {
+            background: #f8fafc;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .tag-good { background: #dcfce7; color: #166534; }
+        .tag-mid { background: #fef3c7; color: #92400e; }
+        .tag-danger { background: #fee2e2; color: #991b1b; }
+        .tag-info { background: #d1fae5; color: #065f46; }
+        .run-preview {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: zoom-in;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+        }
+        .run-upload-empty {
+            width: 34px;
+            height: 34px;
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            cursor: pointer;
+            background: #fff;
+        }
+        .importance-row {
+            display: grid;
+            grid-template-columns: 110px 1fr 70px 50px;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .importance-bar {
+            height: 22px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .importance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            border-radius: 999px;
+        }
+        .highlight-box {
+            border: 1px solid #a7f3d0;
+            background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+            border-radius: 16px;
+            padding: 18px;
+        }
+        .combination-cell {
+            min-width: 180px;
+            color: var(--text);
+        }
+        .section-tip {
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #f8fafc;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 13px;
+        }
+        .image-lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-lightbox.active { display: flex; }
+        .image-lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 10px;
+        }
+        @media (max-width: 960px) {
+            .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .factor-level-row, .importance-row { grid-template-columns: 1fr; }
+            table { display: block; overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="topbar">
+        <details class="page-switcher">
+            <summary>实验方法切换</summary>
+            <div class="page-menu">
+                <a class="page-option" href="/">MAB 多臂老虎机</a>
+                <a class="page-option" href="/paper">Best of Three Worlds</a>
+                <a class="page-option active" href="/taguchi">田口正交实验</a>
+                <a class="page-option" href="/compare">左右对比</a>
+            </div>
+        </details>
+    </div>
+
+    <section class="hero">
+        <span class="eyebrow">真正的田口实验流程</span>
+        <h1>实验3：田口正交实验设计</h1>
+        <p>这一页按田口方法的正确顺序来做：先定义因素与水平，再自动生成正交组合，然后为每个实验组合上传主图并录入曝光点击，最后输出因素重要性与推荐部署方向。</p>
+        <div class="hero-badges">
+            <span class="badge">先设计因素</span>
+            <span class="badge">自动生成 L4 / L9</span>
+            <span class="badge">按组合测试</span>
+            <span class="badge">看主效应与推荐组合</span>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>单页流程</h2>
+        <div class="intro">同一网页中分 4 个可折叠部分：1）因素设置，2）正交组合生成，3）实验数据录入，4）结果分析。你不用在多个页面跳转。</div>
+
+        <form method="POST" enctype="multipart/form-data" id="taguchiForm">
+            <input type="hidden" name="experiment_id" value="{{ experiment_id or '' }}">
+            <input type="hidden" name="taguchi_payload" id="taguchiPayload">
+
+            <div class="actions">
+                <input type="text" name="experiment_title" value="{{ experiment_title or '田口正交实验' }}" placeholder="实验名称">
+                <button type="button" class="btn btn-secondary" id="generateRunsBtn">生成正交组合</button>
+                <button type="submit" class="btn btn-primary">保存并计算结果</button>
+                <button type="button" class="btn btn-secondary" id="resetDefaultBtn">恢复默认示例</button>
+            </div>
+
+            <details class="fold" open>
+                <summary>
+                    <span>第 1 部分：定义因素与水平</span>
+                    <span class="summary-note">先定义实验空间，系统再生成组合</span>
+                </summary>
+                <div class="fold-body">
+                    <div class="section-tip">每个因素至少 2 个水平。当前页面优先支持 3 因素×3 水平生成 L9，也支持 3 因素×2 水平生成 L4。不要先上传随意图片再回填因素，那不是标准田口流程。</div>
+                    <div id="factorContainer"></div>
+                </div>
+            </details>
+
+            <details class="fold" open>
+                <summary>
+                    <span>第 2 部分：正交组合生成</span>
+                    <span class="summary-note">系统自动生成实验任务单</span>
+                </summary>
+                <div class="fold-body">
+                    <div class="grid-4" style="margin-bottom: 16px;">
+                        <div class="metric"><span>正交表</span><strong id="orthogonalNameText">{{ orthogonal_name or '未生成' }}</strong></div>
+                        <div class="metric"><span>因素数</span><strong id="factorCountText">0</strong></div>
+                        <div class="metric"><span>每因素水平数</span><strong id="levelCountText">0</strong></div>
+                        <div class="metric"><span>实验组合数</span><strong id="runCountText">0</strong></div>
+                    </div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>实验编号</th>
+                            <th>组合说明</th>
+                            <th>因素明细</th>
+                        </tr>
+                        </thead>
+                        <tbody id="designTableBody"></tbody>
+                    </table>
+                </div>
+            </details>
+
+            <details class="fold" open>
+                <summary>
+                    <span>第 3 部分：按组合录入实验数据</span>
+                    <span class="summary-note">每一行就是一个正交组合</span>
+                </summary>
+                <div class="fold-body">
+                    <div class="section-tip">这里录入的不是“自定义图片标签”，而是已经由上面正交表生成好的实验方案。你只需要为每一组方案制作对应主图，然后上传图片并填写访客/点击。</div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>主图</th>
+                            <th>实验编号</th>
+                            <th>组合说明</th>
+                            <th>访客数</th>
+                            <th>点击数</th>
+                        </tr>
+                        </thead>
+                        <tbody id="runTableBody"></tbody>
+                    </table>
+                </div>
+            </details>
+        </form>
+    </section>
+
+    {% if results %}
+    <details class="fold" open>
+        <summary>
+            <span>第 4 部分：结果分析</span>
+            <span class="summary-note">看因素重要性、最优组合、优先部署建议</span>
+        </summary>
+        <div class="fold-body">
+            <div class="grid-4" style="margin-bottom: 18px;">
+                <div class="metric"><span>正交表</span><strong>{{ results.taguchi.orthogonal_name or '—' }}</strong></div>
+                <div class="metric"><span>实验组合数</span><strong>{{ results.taguchi.run_count }}</strong></div>
+                <div class="metric"><span>总访客数</span><strong>{{ "{:,}".format(results.total_visitors) }}</strong></div>
+                <div class="metric"><span>整体点击率</span><strong>{{ "{:.2f}".format(results.average_ctr * 100) }}%</strong></div>
+            </div>
+
+            <div class="highlight-box" style="margin-bottom: 18px;">
+                <div style="font-size: 14px; color: var(--muted); margin-bottom: 8px;">推荐部署</div>
+                <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">{{ results.taguchi.recommended_deployment or '暂无' }}</div>
+                <div style="font-size: 14px; color: var(--muted);">推荐最优组合：{{ results.taguchi.optimal_combination }}</div>
+            </div>
+
+            <div class="card" style="margin-bottom: 16px; padding: 18px;">
+                <h2 style="font-size: 18px;">因素重要性排序</h2>
+                {% for item in results.taguchi.factor_importance %}
+                <div class="importance-row">
+                    <strong>{{ item.factor }}</strong>
+                    <div class="importance-bar"><div class="importance-fill" style="width: {{ item.importance_weight }}%;"></div></div>
+                    <strong>{{ item.importance_weight }}%</strong>
+                    <span class="tag {% if item.importance_level == '高' %}tag-good{% elif item.importance_level == '中' %}tag-mid{% else %}tag-danger{% endif %}">{{ item.importance_level }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="card" style="margin-bottom: 16px; padding: 18px;">
+                <h2 style="font-size: 18px;">主效应分析</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>因素</th>
+                        <th>极差</th>
+                        <th>最佳水平</th>
+                        <th>各水平平均 S/N</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in results.taguchi.range_analysis %}
+                    <tr>
+                        <td>{{ item.factor }}</td>
+                        <td>{{ item.range }}</td>
+                        <td>{{ item.best_level }}</td>
+                        <td>
+                            {% for level in item.levels %}
+                                <div>{{ level.name }}：{{ level.avg_sn }}</div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card" style="padding: 18px;">
+                <h2 style="font-size: 18px;">各实验组合表现</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>主图</th>
+                        <th>实验编号</th>
+                        <th>组合说明</th>
+                        <th>CTR</th>
+                        <th>S/N</th>
+                        <th>访客数</th>
+                        <th>点击数</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in results.taguchi.sn_ratios %}
+                    <tr>
+                        <td>
+                            {% if row.image_path %}
+                            <img src="{{ row.image_path if row.image_path.startswith('data:') else url_for('static', filename=row.image_path) }}" class="run-preview previewable" alt="{{ row.name }}" data-src="{{ row.image_path if row.image_path.startswith('data:') else url_for('static', filename=row.image_path) }}">
+                            {% endif %}
+                        </td>
+                        <td>{{ row.name }}</td>
+                        <td class="combination-cell">{{ row.combination_label }}</td>
+                        <td>{{ row.ctr }}%</td>
+                        <td>{{ row.sn_ratio }}</td>
+                        <td>{{ row.visitors }}</td>
+                        <td>{{ row.clicks }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </details>
+    {% endif %}
+
+    <div class="image-lightbox" id="imageLightbox"><img id="lightboxImage" src="" alt=""></div>
+</div>
+
+<script>
+    const initialFactors = {{ taguchi_factors|tojson }};
+    const initialDailyData = {{ daily_data|tojson }};
+    const orthogonalTables = {
+        L4: [[1,1,1],[1,2,2],[2,1,2],[2,2,1]],
+        L9: [[1,1,1],[1,2,2],[1,3,3],[2,1,2],[2,2,3],[2,3,1],[3,1,3],[3,2,1],[3,3,2]]
+    };
+
+    let factorState = JSON.parse(JSON.stringify(initialFactors || []));
+    let runState = (initialDailyData && initialDailyData[0] && initialDailyData[0].data) ? JSON.parse(JSON.stringify(initialDailyData[0].data)) : [];
+    let orthogonalName = (initialDailyData && initialDailyData[0] && initialDailyData[0].taguchi_design) ? (initialDailyData[0].taguchi_design.orthogonal_name || '') : '{{ orthogonal_name or "" }}';
+
+    function getLevelCount(factors) {
+        if (!factors.length) return 0;
+        return (factors[0].levels || []).filter(Boolean).length;
+    }
+
+    function currentFactors() {
+        return factorState.map((factor, factorIndex) => ({
+            key: factor.key || `factor_${factorIndex + 1}`,
+            name: factor.name || `因素${factorIndex + 1}`,
+            levels: (factor.levels || []).map(level => (level || '').trim()).filter(Boolean)
+        })).filter(factor => factor.name && factor.levels.length >= 2);
+    }
+
+    function pickOrthogonalTable(factors) {
+        const factorCount = factors.length;
+        const levelCount = getLevelCount(factors);
+        if (factorCount === 3 && levelCount === 2) return { name: 'L4', rows: orthogonalTables.L4 };
+        if (factorCount === 3 && levelCount === 3) return { name: 'L9', rows: orthogonalTables.L9 };
+        return { name: '', rows: [] };
+    }
+
+    function renderFactorEditor() {
+        const container = document.getElementById('factorContainer');
+        container.innerHTML = '';
+        factorState.forEach((factor, factorIndex) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'factor-card';
+            wrapper.innerHTML = `
+                <div class="factor-head">
+                    <input type="text" value="${factor.name || ''}" data-factor-index="${factorIndex}" data-role="factor-name">
+                    <button type="button" class="btn btn-danger" data-remove-factor="${factorIndex}">删除因素</button>
+                </div>
+                <div class="factor-levels">
+                    ${(factor.levels || []).map((level, levelIndex) => `
+                        <div class="factor-level-row">
+                            <div>水平 ${levelIndex + 1}</div>
+                            <input type="text" value="${level || ''}" data-factor-index="${factorIndex}" data-level-index="${levelIndex}" data-role="factor-level">
+                            <button type="button" class="btn btn-secondary" data-remove-level="${factorIndex}-${levelIndex}">删除水平</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="margin-top: 12px;">
+                    <button type="button" class="btn btn-secondary" data-add-level="${factorIndex}">+ 添加水平</button>
+                </div>
+            `;
+            container.appendChild(wrapper);
+        });
+        const action = document.createElement('div');
+        action.style.marginTop = '14px';
+        action.innerHTML = '<button type="button" class="btn btn-secondary" id="addFactorBtn">+ 添加因素</button>';
+        container.appendChild(action);
+    }
+
+    function generateRuns() {
+        const factors = currentFactors();
+        const table = pickOrthogonalTable(factors);
+        orthogonalName = table.name;
+        if (!table.rows.length) {
+            alert('当前只支持 3 因素×2 水平（L4）或 3 因素×3 水平（L9）。请先把因素数量和水平数量整理成这两种结构。');
+            return;
+        }
+
+        const existingByRun = new Map(runState.map(item => [item.run_id, item]));
+        runState = table.rows.map((row, runIndex) => {
+            const previous = existingByRun.get(runIndex + 1) || {};
+            const item = {
+                name: `实验${runIndex + 1}`,
+                run_id: runIndex + 1,
+                image_path: previous.image_path || '',
+                visitors: previous.visitors || 0,
+                clicks: previous.clicks || 0,
+                combination_label: '',
+                assignments: []
+            };
+            const labels = [];
+            factors.forEach((factor, factorIndex) => {
+                const levelIndex = row[factorIndex] - 1;
+                const levelValue = factor.levels[levelIndex];
+                item[factor.key] = levelValue;
+                item.assignments.push({
+                    factor_key: factor.key,
+                    factor_name: factor.name,
+                    level_index: levelIndex + 1,
+                    level_value: levelValue
+                });
+                labels.push(levelValue);
+            });
+            item.combination_label = labels.join(' + ');
+            return item;
+        });
+        renderDesignTable();
+        renderRunTable();
+        updateSummary();
+    }
+
+    function renderDesignTable() {
+        const body = document.getElementById('designTableBody');
+        body.innerHTML = runState.map(run => `
+            <tr>
+                <td>${run.name}</td>
+                <td class="combination-cell">${run.combination_label || ''}</td>
+                <td>${(run.assignments || []).map(item => `${item.factor_name}= ${item.level_value}`).join('<br>')}</td>
+            </tr>
+        `).join('');
+    }
+
+    function runImageCell(run, index) {
+        if (run.image_path) {
+            const src = run.image_path.startsWith('data:') ? run.image_path : `/static/${run.image_path}`;
+            return `<label><img src="${src}" class="run-preview previewable" data-src="${src}"><input type="file" name="run_image_file_${index}" accept="image/*" style="display:none" data-run-image-input="${index}"></label>`;
+        }
+        return `<label class="run-upload-empty">+<input type="file" name="run_image_file_${index}" accept="image/*" style="display:none" data-run-image-input="${index}"></label>`;
+    }
+
+    function renderRunTable() {
+        const body = document.getElementById('runTableBody');
+        body.innerHTML = runState.map((run, index) => `
+            <tr>
+                <td>${runImageCell(run, index)}</td>
+                <td>${run.name}</td>
+                <td class="combination-cell">${run.combination_label || ''}</td>
+                <td><input type="number" min="0" value="${run.visitors || 0}" data-run-field="visitors" data-run-index="${index}"></td>
+                <td><input type="number" min="0" value="${run.clicks || 0}" data-run-field="clicks" data-run-index="${index}"></td>
+            </tr>
+        `).join('');
+    }
+
+    function updateSummary() {
+        const factors = currentFactors();
+        document.getElementById('orthogonalNameText').textContent = orthogonalName || '未生成';
+        document.getElementById('factorCountText').textContent = factors.length;
+        document.getElementById('levelCountText').textContent = getLevelCount(factors);
+        document.getElementById('runCountText').textContent = runState.length;
+    }
+
+    function syncPayload() {
+        const factors = currentFactors();
+        const payload = [{
+            date: (initialDailyData && initialDailyData[0] && initialDailyData[0].date) ? initialDailyData[0].date : '2024-01-01',
+            taguchi_design: {
+                factors: factors,
+                orthogonal_name: orthogonalName
+            },
+            data: runState.map(run => ({
+                ...run,
+                visitors: Number(run.visitors || 0),
+                clicks: Number(run.clicks || 0)
+            }))
+        }];
+        document.getElementById('taguchiPayload').value = JSON.stringify(payload);
+    }
+
+    document.addEventListener('click', function (event) {
+        const addFactorBtn = event.target.closest('#addFactorBtn');
+        if (addFactorBtn) {
+            factorState.push({ key: `factor_${factorState.length + 1}`, name: `因素${factorState.length + 1}`, levels: ['水平1', '水平2', '水平3'] });
+            renderFactorEditor();
+            return;
+        }
+        const addLevel = event.target.closest('[data-add-level]');
+        if (addLevel) {
+            const factorIndex = Number(addLevel.getAttribute('data-add-level'));
+            factorState[factorIndex].levels.push(`水平${factorState[factorIndex].levels.length + 1}`);
+            renderFactorEditor();
+            return;
+        }
+        const removeFactor = event.target.closest('[data-remove-factor]');
+        if (removeFactor) {
+            const factorIndex = Number(removeFactor.getAttribute('data-remove-factor'));
+            factorState.splice(factorIndex, 1);
+            renderFactorEditor();
+            return;
+        }
+        const removeLevel = event.target.closest('[data-remove-level]');
+        if (removeLevel) {
+            const [factorIndex, levelIndex] = removeLevel.getAttribute('data-remove-level').split('-').map(Number);
+            factorState[factorIndex].levels.splice(levelIndex, 1);
+            renderFactorEditor();
+        }
+    });
+
+    document.addEventListener('input', function (event) {
+        const nameInput = event.target.closest('[data-role="factor-name"]');
+        if (nameInput) {
+            factorState[Number(nameInput.dataset.factorIndex)].name = nameInput.value;
+            return;
+        }
+        const levelInput = event.target.closest('[data-role="factor-level"]');
+        if (levelInput) {
+            factorState[Number(levelInput.dataset.factorIndex)].levels[Number(levelInput.dataset.levelIndex)] = levelInput.value;
+            return;
+        }
+        const runField = event.target.closest('[data-run-field]');
+        if (runField) {
+            const runIndex = Number(runField.dataset.runIndex);
+            const field = runField.dataset.runField;
+            runState[runIndex][field] = Number(runField.value || 0);
+        }
+    });
+
+    document.addEventListener('change', function (event) {
+        const fileInput = event.target.closest('[data-run-image-input]');
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            const runIndex = Number(fileInput.getAttribute('data-run-image-input'));
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                runState[runIndex].image_path = e.target.result;
+                renderRunTable();
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    });
+
+    document.getElementById('generateRunsBtn').addEventListener('click', function () {
+        generateRuns();
+    });
+
+    document.getElementById('resetDefaultBtn').addEventListener('click', function () {
+        window.location.href = '/taguchi';
+    });
+
+    document.getElementById('taguchiForm').addEventListener('submit', function () {
+        syncPayload();
+    });
+
+    document.addEventListener('click', function (event) {
+        const preview = event.target.closest('.previewable');
+        if (!preview) return;
+        const lightbox = document.getElementById('imageLightbox');
+        const image = document.getElementById('lightboxImage');
+        image.src = preview.getAttribute('data-src') || preview.src;
+        lightbox.classList.add('active');
+    });
+
+    document.getElementById('imageLightbox').addEventListener('click', function () {
+        this.classList.remove('active');
+    });
+
+    renderFactorEditor();
+    if (!runState.length) {
+        generateRuns();
+    } else {
+        renderDesignTable();
+        renderRunTable();
+        updateSummary();
+    }
+    syncPayload();
+</script>
+</body>
+</html>

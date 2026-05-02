@@ -217,6 +217,101 @@
             padding: 6px 8px;
         }
 
+        .image-upload-cell {
+            position: relative;
+            width: 40px;
+            min-width: 40px;
+            max-width: 40px;
+            padding: 6px !important;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+
+        .image-preview-box {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+        }
+
+        .image-preview-box.is-empty {
+            display: none;
+        }
+
+        .image-preview-thumb {
+            width: 28px;
+            height: 28px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            display: block;
+        }
+
+        .image-preview-remove {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            width: 14px;
+            height: 14px;
+            border: none;
+            border-radius: 999px;
+            background: rgba(31, 41, 55, 0.88);
+            color: #fff;
+            font-size: 10px;
+            line-height: 14px;
+            cursor: pointer;
+            padding: 0;
+            text-align: center;
+        }
+
+        .image-upload-input {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        .image-placeholder-text {
+            display: none;
+        }
+
+        .image-lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        .image-lightbox.active {
+            display: flex;
+        }
+
+        .image-lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .image-preview-thumb {
+            cursor: zoom-in;
+        }
+
         .actions {
             display: flex;
             gap: 12px;
@@ -576,6 +671,7 @@
                 <div class="page-menu">
                     <a class="page-option active" href="/">MAB 多臂老虎机</a>
                     <a class="page-option" href="/paper">Best of Three Worlds 自适应实验</a>
+                    <a class="page-option" href="/taguchi">田口正交实验</a>
                     <a class="page-option" href="/compare">左右对比</a>
                 </div>
             </details>
@@ -647,16 +743,21 @@
                             <tbody>
                                 {% for item in day.data %}
                                 <tr>
-                                    <td>
-                                        {% if item.image_path %}
-                                        <img src="{{ url_for('static', filename=item.image_path) }}" alt="{{ item.name }}" style="width: 54px; height: 54px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);">
-                                        {% endif %}
+                                    <td class="image-upload-cell" {% if day_index == 0 %}onclick="if(!event.target.classList.contains('image-preview-thumb'))this.querySelector('input[type=file]').click()"{% endif %}>
+                                        <div class="image-preview-box{% if not item.image_path %} is-empty{% endif %}">
+                                            {% if item.image_path %}
+                                            <img src="{{ url_for('static', filename=item.image_path) }}" alt="{{ item.name }}" class="image-preview-thumb">
+                                            {% if day_index == 0 %}
+                                            <button type="button" class="image-preview-remove" onclick="event.stopPropagation();clearPreviewImage(this)">×</button>
+                                            {% endif %}
+                                            {% endif %}
+                                        </div>
                                         <input type="hidden" name="{{ day.date.replace('-', '') }}_image_path[]" value="{{ item.image_path|default('') }}">
                                         {% if day_index == 0 %}
-                                        <input type="file" name="{{ day.date.replace('-', '') }}_image_file[]" accept="image/*" style="width: 120px; font-size: 11px;" onchange="previewImage(this)">
+                                        <input type="file" name="{{ day.date.replace('-', '') }}_image_file[]" accept="image/*" class="image-upload-input" onchange="previewImage(this)">
                                         {% else %}
-                                        <span style="font-size: 12px; color: var(--muted);">沿用首日图片</span>
-                                        <input type="file" name="{{ day.date.replace('-', '') }}_image_file[]" accept="image/*" style="display: none;">
+                                        <span class="image-placeholder-text">沿用首日图片</span>
+                                        <input type="file" name="{{ day.date.replace('-', '') }}_image_file[]" accept="image/*" style="display: none;" onchange="previewImage(this)">
                                         {% endif %}
                                     </td>
                                     <td><input type="text" name="{{ day.date.replace('-', '') }}_name[]" value="{{ item.name }}" {% if day_index > 0 %}readonly{% endif %}></td>
@@ -780,6 +881,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>主图</th>
                         <th>主图编号</th>
                         <th>累计点击率</th>
                         <th>
@@ -868,6 +970,7 @@
                 <tbody>
                     {% for row in results.rows %}
                     <tr>
+                        <td style="padding:6px;width:40px;min-width:40px;max-width:40px;vertical-align:middle;">{% if row.image_path %}<img src="{{ url_for('static', filename=row.image_path) }}" alt="{{ row.name }}" class="image-preview-thumb">{% endif %}</td>
                         <td>{{ row.name }}</td>
                         <td>{{ '%.2f%%'|format(row.ctr * 100) }}</td>
                         <td>{{ '%.2f%%'|format(row.ci_low * 100) }}</td>
@@ -1001,24 +1104,29 @@
             });
         }
 
-        function buildDayTR(name, type, path, isFirstDay, editable) {
+        function buildDayTR(name, type, path, isFirstDay, editable, previewSrc) {
             const ro = editable ? '' : 'readonly';
-            const hidden = editable ? '' : 'style="display:none;"';
+            const imageSrc = previewSrc || (path ? '/static/' + path : '');
             let html = '<tr>';
-            html += '<td>';
-            if (path) {
-                html += `<img src="/static/${path}" alt="${name}" style="width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--border);">`;
+            html += '<td class="image-upload-cell"' + (isFirstDay ? ' onclick="if(!event.target.classList.contains(\'image-preview-thumb\'))this.querySelector(\'input[type=file]\').click()"' : '') + '>';
+            html += '<div class="image-preview-box' + (imageSrc ? '' : ' is-empty') + '">';
+            if (imageSrc) {
+                html += '<img src="' + imageSrc + '" alt="' + name + '" class="image-preview-thumb">';
+                if (isFirstDay) {
+                    html += '<button type="button" class="image-preview-remove" onclick="event.stopPropagation();clearPreviewImage(this)">×</button>';
+                }
             }
-            html += `<input type="hidden" name="temp_image_path[]" value="${path || ''}">`;
+            html += '</div>';
+            html += '<input type="hidden" name="temp_image_path[]" value="' + (path || '') + '">';
             if (isFirstDay) {
-                html += `<input type="file" name="temp_image_file[]" accept="image/*" style="width:120px;font-size:11px;" onchange="previewImage(this)">`;
+                html += '<input type="file" name="temp_image_file[]" accept="image/*" class="image-upload-input" onchange="previewImage(this)">';
             } else {
-                html += `<span style="font-size:12px;color:var(--muted);">沿用首日图片</span>`;
-                html += `<input type="file" name="temp_image_file[]" accept="image/*" style="display:none;" onchange="previewImage(this)">`;
+                html += '<span class="image-placeholder-text">沿用首日图片</span>';
+                html += '<input type="file" name="temp_image_file[]" accept="image/*" style="display:none;" onchange="previewImage(this)">';
             }
             html += '</td>';
-            html += `<td><input type="text" name="temp_name[]" value="${name}" ${ro}></td>`;
-            html += `<td><input type="text" name="temp_image_type[]" value="${type}" ${ro}></td>`;
+            html += '<td><input type="text" name="temp_name[]" value="' + name + '" ' + ro + '></td>';
+            html += '<td><input type="text" name="temp_image_type[]" value="' + type + '" ' + ro + '></td>';
             html += '<td><input type="number" min="0" name="temp_visitors[]" value="0"></td>';
             html += '<td><input type="number" min="0" name="temp_clicks[]" value="0"></td>';
             html += '<td>0.00%</td>';
@@ -1036,7 +1144,7 @@
             sections.forEach((section, sIdx) => {
                 const isFirstDay = (sIdx === 0);
                 const tbody = section.querySelector('tbody');
-                tbody.insertAdjacentHTML('beforeend', buildDayTR(`主图${newIndex}`, '未分类', '', isFirstDay, isFirstDay));
+                tbody.insertAdjacentHTML('beforeend', buildDayTR(`主图${newIndex}`, '未分类', '', isFirstDay, isFirstDay, ''));
             });
             updateInputNames();
         }
@@ -1148,19 +1256,68 @@
             }
         });
 
+        function updatePreviewCell(td, imageSrc, altText) {
+            const previewBox = td.querySelector('.image-preview-box');
+            if (!previewBox) return;
+            previewBox.classList.toggle('is-empty', !imageSrc);
+            if (imageSrc) {
+                var isFirstDayTd = td.hasAttribute('onclick');
+                previewBox.innerHTML = '<img src="' + imageSrc + '" alt="' + (altText || '图片预览') + '" class="image-preview-thumb">' + (isFirstDayTd ? '<button type="button" class="image-preview-remove" onclick="event.stopPropagation();clearPreviewImage(this)">×</button>' : '');
+            } else {
+                previewBox.innerHTML = '';
+            }
+        }
+
+        function syncInheritedPreview(row, imageSrc) {
+            const firstSection = document.querySelector('.daily-section');
+            if (!firstSection || !firstSection.contains(row)) return;
+            const rowIndex = Array.from(row.parentElement.children).indexOf(row);
+            const sections = document.querySelectorAll('.daily-section');
+            sections.forEach(function(section, sectionIndex) {
+                if (sectionIndex === 0) return;
+                const targetRow = section.querySelectorAll('tbody tr')[rowIndex];
+                if (!targetRow) return;
+                const nameInput = targetRow.querySelectorAll('input')[2];
+                const td = targetRow.cells[0];
+                const previewBox = td.querySelector('.image-preview-box');
+                if (!previewBox) return;
+                previewBox.classList.toggle('is-empty', !imageSrc);
+                if (imageSrc) {
+                    previewBox.innerHTML = '<img src="' + imageSrc + '" alt="' + (nameInput ? nameInput.value : '图片预览') + '" class="image-preview-thumb">';
+                } else {
+                    previewBox.innerHTML = '';
+                }
+            });
+        }
+
+        function clearPreviewImage(button) {
+            const td = button.closest('td');
+            const row = button.closest('tr');
+            const inputs = row.querySelectorAll('input');
+            const hiddenInput = inputs[0];
+            const fileInput = inputs[1];
+            const nameInput = inputs[2];
+            if (hiddenInput) {
+                hiddenInput.value = '';
+            }
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            updatePreviewCell(td, '', nameInput ? nameInput.value : '图片预览');
+            syncInheritedPreview(row, '');
+        }
+
         function previewImage(input) {
             if (!input.files || !input.files[0]) return;
             const reader = new FileReader();
             const td = input.parentElement;
+            const row = input.closest('tr');
+            const nameInput = row ? row.querySelectorAll('input')[2] : null;
             reader.onload = function(e) {
-                let img = td.querySelector('img.preview-thumb');
-                if (!img) {
-                    img = document.createElement('img');
-                    img.className = 'preview-thumb';
-                    img.style.cssText = 'width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--border);margin-right:8px;';
-                    td.insertBefore(img, td.firstChild);
+                updatePreviewCell(td, e.target.result, nameInput ? nameInput.value : '图片预览');
+                if (row) {
+                    syncInheritedPreview(row, e.target.result);
                 }
-                img.src = e.target.result;
             };
             reader.readAsDataURL(input.files[0]);
         }
@@ -1221,6 +1378,20 @@
             a.click();
             URL.revokeObjectURL(url);
         }
+    </script>
+    <div class="image-lightbox" id="imageLightbox" onclick="this.classList.remove('active')">
+        <img id="lightboxImg" src="" alt="放大预览">
+    </div>
+    <script>
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('image-preview-thumb')) {
+                e.stopPropagation();
+                var lightbox = document.getElementById('imageLightbox');
+                var lightboxImg = document.getElementById('lightboxImg');
+                lightboxImg.src = e.target.src;
+                lightbox.classList.add('active');
+            }
+        });
     </script>
 </body>
 </html>

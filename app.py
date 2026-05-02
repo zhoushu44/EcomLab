@@ -3,7 +3,7 @@ import json
 import uuid
 import io
 import base64
-from math import sqrt, log
+from math import sqrt, log, log10
 from datetime import datetime
 
 import pymysql
@@ -86,6 +86,13 @@ METRICS_CONFIG_PAPER = {
     "primary_metric": "ctr",
 }
 
+METRICS_CONFIG_TAGUCHI = {
+    "name": "田口正交实验",
+    "input_fields": ["visitors", "clicks"],
+    "output_metrics": ["ctr"],
+    "primary_metric": "ctr",
+}
+
 METRICS_CONFIG_PRESETS = {
     "mab": METRICS_CONFIG_MAB,
     "paper": METRICS_CONFIG_PAPER,
@@ -111,19 +118,19 @@ METRICS_CONFIG_SUGGESTION_RULES = [
 ]
 DEFAULT_DAILY_DATA = [
     {"date": "2024-01-01", "data": [
-        {"name": "主图1", "image_type": "白底图", "visitors": 400, "clicks": 32},
-        {"name": "主图2", "image_type": "场景图", "visitors": 390, "clicks": 38},
-        {"name": "主图3", "image_type": "细节图", "visitors": 405, "clicks": 30},
+        {"name": "白底图-居中", "image_type": "白底图", "background": "纯色", "text_position": "居中", "product_angle": "正面", "image_path": "uploads/sample_1.png", "visitors": 400, "clicks": 32},
+        {"name": "场景图-右侧", "image_type": "场景图", "background": "渐变", "text_position": "右侧", "product_angle": "45°角", "image_path": "uploads/sample_2.png", "visitors": 390, "clicks": 38},
+        {"name": "细节图-左侧", "image_type": "细节图", "background": "留白", "text_position": "左侧", "product_angle": "侧面", "image_path": "uploads/sample_3.png", "visitors": 405, "clicks": 30},
     ]},
     {"date": "2024-01-02", "data": [
-        {"name": "主图1", "image_type": "白底图", "visitors": 420, "clicks": 35},
-        {"name": "主图2", "image_type": "场景图", "visitors": 410, "clicks": 39},
-        {"name": "主图3", "image_type": "细节图", "visitors": 430, "clicks": 32},
+        {"name": "白底图-居中", "image_type": "白底图", "background": "纯色", "text_position": "居中", "product_angle": "正面", "image_path": "uploads/sample_1.png", "visitors": 420, "clicks": 35},
+        {"name": "场景图-右侧", "image_type": "场景图", "background": "渐变", "text_position": "右侧", "product_angle": "45°角", "image_path": "uploads/sample_2.png", "visitors": 410, "clicks": 39},
+        {"name": "细节图-左侧", "image_type": "细节图", "background": "留白", "text_position": "左侧", "product_angle": "侧面", "image_path": "uploads/sample_3.png", "visitors": 430, "clicks": 32},
     ]},
     {"date": "2024-01-03", "data": [
-        {"name": "主图1", "image_type": "白底图", "visitors": 380, "clicks": 29},
-        {"name": "主图2", "image_type": "场景图", "visitors": 380, "clicks": 33},
-        {"name": "主图3", "image_type": "细节图", "visitors": 380, "clicks": 26},
+        {"name": "白底图-居中", "image_type": "白底图", "background": "纯色", "text_position": "居中", "product_angle": "正面", "image_path": "uploads/sample_1.png", "visitors": 380, "clicks": 29},
+        {"name": "场景图-右侧", "image_type": "场景图", "background": "渐变", "text_position": "右侧", "product_angle": "45°角", "image_path": "uploads/sample_2.png", "visitors": 380, "clicks": 33},
+        {"name": "细节图-左侧", "image_type": "细节图", "background": "留白", "text_position": "左侧", "product_angle": "侧面", "image_path": "uploads/sample_3.png", "visitors": 380, "clicks": 26},
     ]},
 ]
 
@@ -137,6 +144,43 @@ def save_uploaded_image(upload_file):
     saved_path = os.path.join(UPLOAD_DIR, saved_name)
     upload_file.save(saved_path)
     return f"uploads/{saved_name}"
+
+
+def save_data_url_image(data_url):
+    if not data_url or not isinstance(data_url, str) or not data_url.startswith("data:image/"):
+        return data_url or ""
+    try:
+        header, encoded = data_url.split(",", 1)
+    except ValueError:
+        return ""
+    extension = ".png"
+    if ";base64" in header:
+        mime_part = header.split(";", 1)[0]
+        extension = f".{mime_part.split('/')[-1].lower()}"
+        if extension == ".jpeg":
+            extension = ".jpg"
+    try:
+        image_bytes = base64.b64decode(encoded)
+    except (ValueError, TypeError):
+        return ""
+    saved_name = f"{uuid.uuid4().hex}{extension}"
+    saved_path = os.path.join(UPLOAD_DIR, saved_name)
+    with open(saved_path, "wb") as file_obj:
+        file_obj.write(image_bytes)
+    return f"uploads/{saved_name}"
+
+
+def normalize_taguchi_daily_data(daily_data):
+    for day in daily_data or []:
+        for row in day.get("data", []):
+            image_path = row.get("image_path", "")
+            if isinstance(image_path, str) and image_path.startswith("data:image/"):
+                row["image_path"] = save_data_url_image(image_path)
+            visitors = int(row.get("visitors", 0) or 0)
+            clicks = int(row.get("clicks", 0) or 0)
+            row["visitors"] = max(visitors, 0)
+            row["clicks"] = max(0, min(clicks, row["visitors"]))
+    return daily_data
 
 
 def safe_divide(a, b):
@@ -688,6 +732,9 @@ def parse_daily_data(form_data, file_data, metrics_config=None):
         prefix = f"{date.replace('-', '')}_"
         names = form_data.getlist(f"{prefix}name[]")
         image_types = form_data.getlist(f"{prefix}image_type[]")
+        backgrounds = form_data.getlist(f"{prefix}background[]")
+        text_positions = form_data.getlist(f"{prefix}text_position[]")
+        product_angles = form_data.getlist(f"{prefix}product_angle[]")
         image_paths = form_data.getlist(f"{prefix}image_path[]")
         image_files = file_data.getlist(f"{prefix}image_file[]")
         metric_lists = {
@@ -699,6 +746,9 @@ def parse_daily_data(form_data, file_data, metrics_config=None):
         for idx in range(len(names)):
             name = (names[idx] or f"主图{idx + 1}").strip()
             image_type = (image_types[idx] or "未分类").strip()
+            background = (backgrounds[idx] or "纯色").strip()
+            text_position = (text_positions[idx] or "居中").strip()
+            product_angle = (product_angles[idx] or "正面").strip()
             image_path = image_paths[idx].strip() if idx < len(image_paths) else ""
             if idx < len(image_files):
                 uploaded_path = save_uploaded_image(image_files[idx])
@@ -708,6 +758,9 @@ def parse_daily_data(form_data, file_data, metrics_config=None):
             item_data = {
                 "name": name,
                 "image_type": image_type,
+                "background": background,
+                "text_position": text_position,
+                "product_angle": product_angle,
                 "image_path": image_path,
             }
             for field_key, values in metric_lists.items():
@@ -788,6 +841,269 @@ def paper():
         metrics_config=METRICS_CONFIG_PAPER,
         metrics_meta=METRICS,
         output_metrics=OUTPUT_METRICS,
+    )
+
+
+ORTHOGONAL_TABLES = {
+    "L4": {
+        "factors": 3,
+        "levels": 2,
+        "size": 4,
+        "table": [[1,1,1], [1,2,2], [2,1,2], [2,2,1]]
+    },
+    "L9": {
+        "factors": 4,
+        "levels": 3,
+        "size": 9,
+        "table": [
+            [1,1,1,1], [1,2,2,2], [1,3,3,3],
+            [2,1,2,3], [2,2,3,1], [2,3,1,2],
+            [3,1,3,2], [3,2,1,3], [3,3,2,1]
+        ]
+    },
+    "L16": {
+        "factors": 5,
+        "levels": 4,
+        "size": 16,
+        "table": [
+            [1,1,1,1,1], [1,2,2,2,2], [1,3,3,3,3], [1,4,4,4,4],
+            [2,1,2,3,4], [2,2,1,4,3], [2,3,4,1,2], [2,4,3,2,1],
+            [3,1,3,4,2], [3,2,4,3,1], [3,3,1,2,4], [3,4,2,1,3],
+            [4,1,4,2,3], [4,2,3,1,4], [4,3,2,4,1], [4,4,1,3,2]
+        ]
+    }
+}
+
+
+
+def build_default_taguchi_factors():
+    return [
+        {"key": "image_type", "name": "图片类型", "levels": ["白底图", "场景图", "细节图"]},
+        {"key": "text_position", "name": "文字位置", "levels": ["左侧", "居中", "右侧"]},
+        {"key": "product_angle", "name": "产品角度", "levels": ["正面", "45°角", "侧面"]},
+    ]
+
+
+def get_orthogonal_array(factor_count, level_count):
+    if factor_count == 3 and level_count == 2:
+        return "L4", ORTHOGONAL_TABLES["L4"]["table"]
+    if factor_count == 3 and level_count == 3:
+        return "L9", [row[:3] for row in ORTHOGONAL_TABLES["L9"]["table"]]
+    if factor_count == 4 and level_count == 3:
+        return "L9", ORTHOGONAL_TABLES["L9"]["table"]
+    return "", []
+
+
+def build_taguchi_runs(factors):
+    normalized = []
+    for index, factor in enumerate(factors, start=1):
+        levels = [str(level).strip() for level in factor.get("levels", []) if str(level).strip()]
+        if len(levels) >= 2:
+            normalized.append({
+                "key": factor.get("key") or f"factor_{index}",
+                "name": factor.get("name") or f"因素{index}",
+                "levels": levels,
+            })
+
+    if not normalized:
+        return [], "", []
+
+    level_count = len(normalized[0]["levels"])
+    normalized = [factor for factor in normalized if len(factor["levels"]) == level_count]
+    table_name, orthogonal_rows = get_orthogonal_array(len(normalized), level_count)
+    if not orthogonal_rows:
+        return normalized, "", []
+
+    runs = []
+    for run_id, orthogonal_row in enumerate(orthogonal_rows, start=1):
+        assignments = []
+        labels = []
+        item = {
+            "name": f"实验{run_id}",
+            "run_id": run_id,
+            "image_path": "",
+            "visitors": 0,
+            "clicks": 0,
+        }
+        for factor_index, factor in enumerate(normalized):
+            level_index = orthogonal_row[factor_index] - 1
+            level_value = factor["levels"][level_index]
+            item[factor["key"]] = level_value
+            assignments.append({
+                "factor_key": factor["key"],
+                "factor_name": factor["name"],
+                "level_index": level_index + 1,
+                "level_value": level_value,
+            })
+            labels.append(level_value)
+        item["assignments"] = assignments
+        item["combination_label"] = " + ".join(labels)
+        runs.append(item)
+    return normalized, table_name, runs
+
+
+def build_default_taguchi_daily_data():
+    factors = build_default_taguchi_factors()
+    normalized_factors, orthogonal_name, runs = build_taguchi_runs(factors)
+    sample_metrics = [(400, 32), (390, 38), (405, 30), (420, 35), (410, 39), (430, 32), (380, 29), (380, 33), (380, 26)]
+    sample_images = ["uploads/sample_1.png", "uploads/sample_2.png", "uploads/sample_3.png"]
+    for index, run in enumerate(runs):
+        visitors, clicks = sample_metrics[index] if index < len(sample_metrics) else (0, 0)
+        run["visitors"] = visitors
+        run["clicks"] = clicks
+        run["image_path"] = sample_images[index % len(sample_images)] if sample_images else ""
+    return [{
+        "date": "2024-01-01",
+        "taguchi_design": {
+            "factors": normalized_factors,
+            "orthogonal_name": orthogonal_name,
+        },
+        "data": runs,
+    }]
+
+
+def calculate_sn_ratio(values):
+    n = len(values)
+    if n == 0:
+        return 0
+    sum_reciprocal_squares = sum(1/(v**2) for v in values if v > 0)
+    if sum_reciprocal_squares == 0:
+        return 0
+    return -10 * log10(sum_reciprocal_squares / n)
+
+def compute_taguchi_results(daily_data, metrics_config=None):
+    metrics_config = normalize_metrics_config(metrics_config or METRICS_CONFIG_TAGUCHI)
+    base_results = compute_results(daily_data, metrics_config)
+    rows = base_results["rows"]
+    design = daily_data[0].get("taguchi_design", {}) if daily_data else {}
+    design_factors = design.get("factors", [])
+    orthogonal_name = design.get("orthogonal_name", "")
+
+    if not rows:
+        base_results["taguchi"] = {
+            "orthogonal_name": orthogonal_name,
+            "design_factors": design_factors,
+            "run_count": 0,
+            "sn_ratios": [],
+            "range_analysis": [],
+            "optimal_combination": "—",
+            "factor_importance": [],
+            "best_variant": None,
+            "recommended_deployment": "",
+        }
+        return base_results
+
+    for row in rows:
+        ctr = row["ctr"]
+        row["sn_ratio"] = calculate_sn_ratio([ctr]) if ctr > 0 else 0
+
+    factor_importance = []
+    for factor in design_factors:
+        factor_key = factor.get("key", "")
+        level_rows = []
+        for level in factor.get("levels", []):
+            matched = [row for row in rows if row.get(factor_key) == level]
+            avg_sn = sum(item["sn_ratio"] for item in matched) / len(matched) if matched else 0
+            avg_ctr = sum(item["ctr"] for item in matched) / len(matched) if matched else 0
+            level_rows.append({
+                "name": level,
+                "avg_sn": round(avg_sn, 2),
+                "avg_ctr": round(avg_ctr * 100, 2),
+                "count": len(matched),
+            })
+        sn_values = [item["avg_sn"] for item in level_rows]
+        range_value = max(sn_values) - min(sn_values) if sn_values else 0
+        best_level = max(level_rows, key=lambda item: item["avg_sn"]) if level_rows else None
+        factor_importance.append({
+            "factor": factor.get("name", factor_key),
+            "factor_key": factor_key,
+            "levels": level_rows,
+            "range": round(range_value, 2),
+            "best_level": best_level["name"] if best_level else "",
+        })
+
+    factor_importance.sort(key=lambda item: item["range"], reverse=True)
+    total_range = sum(item["range"] for item in factor_importance)
+    for item in factor_importance:
+        item["importance_weight"] = round((item["range"] / total_range) * 100, 1) if total_range > 0 else 0
+        item["importance_level"] = "高" if item["importance_weight"] >= 45 else "中" if item["importance_weight"] >= 20 else "低"
+
+    optimal_parts = [f'{item["factor"]}={item["best_level"]}' for item in factor_importance if item["best_level"]]
+    best_variant = max(rows, key=lambda item: item["sn_ratio"]) if rows else None
+    recommended_deployment = ""
+    if best_variant:
+        recommended_deployment = f'当前已测组合中，优先部署「{best_variant["name"]}」，组合为 {best_variant.get("combination_label", best_variant["name"])}，CTR {round(best_variant["ctr"] * 100, 2)}%，S/N {round(best_variant["sn_ratio"], 2)}。'
+
+    base_results["taguchi"] = {
+        "orthogonal_name": orthogonal_name,
+        "design_factors": design_factors,
+        "run_count": len(rows),
+        "sn_ratios": [{
+            "name": row["name"],
+            "combination_label": row.get("combination_label", row["name"]),
+            "sn_ratio": round(row["sn_ratio"], 2),
+            "ctr": round(row["ctr"] * 100, 2),
+            "visitors": row["visitors"],
+            "clicks": row["clicks"],
+            "image_path": row.get("image_path", ""),
+        } for row in rows],
+        "range_analysis": factor_importance,
+        "factor_importance": factor_importance,
+        "optimal_combination": "；".join(optimal_parts) if optimal_parts else "—",
+        "most_important_factor": factor_importance[0]["factor"] if factor_importance else "",
+        "best_variant": {
+            "name": best_variant["name"],
+            "combination_label": best_variant.get("combination_label", best_variant["name"]),
+            "sn_ratio": round(best_variant["sn_ratio"], 2),
+            "ctr": round(best_variant["ctr"] * 100, 2),
+            "visitors": best_variant["visitors"],
+            "clicks": best_variant["clicks"],
+            "image_path": best_variant.get("image_path", ""),
+        } if best_variant else None,
+        "recommended_deployment": recommended_deployment,
+    }
+    return base_results
+
+
+@app.route("/taguchi", methods=["GET", "POST"])
+def taguchi():
+    daily_data = build_default_taguchi_daily_data()
+    experiment_id = request.args.get("id", "")
+    experiment_title = ""
+    if experiment_id:
+        loaded = load_experiment(experiment_id)
+        if loaded:
+            daily_data = loaded["daily_data"]
+            experiment_title = loaded["title"]
+
+    if request.method == "POST":
+        payload_text = request.form.get("taguchi_payload", "").strip()
+        if payload_text:
+            daily_data = normalize_taguchi_daily_data(json.loads(payload_text))
+        experiment_id = request.form.get("experiment_id", "") or uuid.uuid4().hex
+        experiment_title = request.form.get("experiment_title", "") or "田口正交实验"
+        save_experiment(experiment_id, experiment_title, "taguchi", daily_data)
+
+    if not experiment_title:
+        experiment_title = "田口正交实验"
+
+    design = daily_data[0].get("taguchi_design", {}) if daily_data else {}
+    taguchi_factors = design.get("factors", build_default_taguchi_factors())
+    orthogonal_name = design.get("orthogonal_name", "")
+    results = compute_taguchi_results(daily_data, METRICS_CONFIG_TAGUCHI)
+    experiments = list_experiments("taguchi")
+    return render_template(
+        "taguchi.html",
+        daily_data=daily_data,
+        results=results,
+        experiment_id=experiment_id,
+        experiment_title=experiment_title,
+        experiments=experiments,
+        metrics_config=METRICS_CONFIG_TAGUCHI,
+        metrics_meta=METRICS,
+        output_metrics=OUTPUT_METRICS,
+        taguchi_factors=taguchi_factors,
+        orthogonal_name=orthogonal_name,
     )
 
 
@@ -994,4 +1310,4 @@ def serialize_daily_data(daily_data):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
